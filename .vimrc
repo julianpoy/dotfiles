@@ -111,6 +111,12 @@ call plug#end()
 
 filetype plugin indent on
 
+" ----- Auto install plugins on launch -----
+autocmd VimEnter *
+  \  if len(filter(values(g:plugs), '!isdirectory(v:val.dir)'))
+  \|   PlugInstall --sync | q
+  \| endif
+
 " ----- General Vim Settings -----
 set foldmethod=syntax         
 set foldlevelstart=99
