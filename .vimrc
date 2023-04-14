@@ -8,6 +8,7 @@ let g:enable_arrowkeys = 0 " self explanatory
 let g:use_inline_definition_previews = 0 " goto-definition previews like VSCode by default
 let g:theme = 'morhetz/gruvbox' " your syntax theme
 let g:theme_name = 'gruvbox' " your syntax theme title (will differ from theme)
+let g:termguicolors = 1 " needed for proper color support in most terminal environments. turn off if your theme does not support
 let g:copilot = 0 " github copilot (paid, but has no effect if not activated)
 let g:tabnine = 0 " tabnine AI autocompletion (free, doesn't play super well with copilot and is lower quality)
 let g:coc_extensions = [
@@ -134,6 +135,9 @@ set signcolumn=yes
 " Update git and syntax more quickly
 set updatetime=250
 syntax on
+if g:termguicolors
+  set termguicolors
+endif
 
 " ----- Theme -----
 
