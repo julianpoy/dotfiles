@@ -21,9 +21,11 @@ fish -c "set --universal nvm_default_version 18"
 fish -c "set --universal nvm_default_packages yarn neovim"
 
 # NeoVim
-wget https://github.com/neovim/neovim/releases/download/v0.8.3/nvim-linux64.deb -O /tmp/nvim.deb
-sudo apt install /tmp/nvim.deb -y
-fish -c "alias vim='nvim' && funcsave vim"
+wget https://github.com/neovim/neovim/releases/download/v0.9.1/nvim.appimage -O ~/nvim.appimage 
+chmod +x ~/nvim.appimage
+cd ~
+~/nvim.appimage --appimage-extract
+fish -c "alias vim='~/squashfs-root/usr/bin/nvim' && funcsave vim"
 
 sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
        https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
