@@ -387,6 +387,11 @@ require('lazy').setup({
 
   -- Fuzzy Finder (files, lsp, etc)
   { 'nvim-telescope/telescope.nvim', version = '*', dependencies = { 'nvim-lua/plenary.nvim' } },
+  -- {'nvim-telescope/telescope-ui-select.nvim', dependencies = { 'nvim-telescope/telescope.nvim' } },
+  {
+    'stevearc/dressing.nvim',
+    opts = {},
+  },
 
   -- Fuzzy Finder Algorithm which requires local dependencies to be built.
   -- Only load if `make` is available. Make sure you have the system
@@ -593,8 +598,33 @@ require('telescope').setup {
     },
     lsp_references = {
       show_line = false
-    }
+    },
+    lsp_definitions = {
+      show_line = false
+    },
+    lsp_type_definitions = {
+      show_line = false
+    },
+    lsp_implementations = {
+      show_line = false
+    },
   }
+}
+local telescopeCursor = require("telescope.themes").get_cursor()
+require('dressing').setup {
+  input = {
+    insert_only = false,
+    relative = "cursor",
+  },
+  select = {
+    get_config = function(opts)
+      if opts.kind == "codeaction" then
+        return {
+          telescope = telescopeCursor,
+        }
+      end
+    end,
+  },
 }
 
 -- Enable telescope fzf native, if installed
@@ -709,10 +739,10 @@ local on_attach = function(_, bufnr)
   map('n', '<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
   map('n', '<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
 
-  map('n', 'gd', vim.lsp.buf.definition, '[G]oto [D]efinition')
+  map('n', 'gd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
   map('n', 'gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
-  map('n', 'gi', vim.lsp.buf.implementation, '[G]oto [I]mplementation')
-  map('n', 'gy', vim.lsp.buf.type_definition, '[G]oto T[y]pe Definition')
+  map('n', 'gi', require('telescope.builtin').lsp_implementations, '[G]oto [I]mplementation')
+  map('n', 'gy', require('telescope.builtin').lsp_type_definitions, '[G]oto T[y]pe Definition')
   map('n', '<leader>ds', require('telescope.builtin').lsp_document_symbols, '[D]ocument [S]ymbols') -- TODO: potentially remap this
   map('n', '<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols') -- TODO: potentially remap this
 
