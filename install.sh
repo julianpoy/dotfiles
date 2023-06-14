@@ -27,11 +27,8 @@ cd ~
 ~/nvim.appimage --appimage-extract
 fish -c "alias vim='~/squashfs-root/usr/bin/nvim' && funcsave vim"
 
-sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
-       https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
-
 mkdir -p $HOME/.config/nvim
-wget $DOTFILES_URI/raw/master/.vimrc -O $HOME/.config/nvim/init.vim
+wget $DOTFILES_URI/raw/master/init.lua -O $HOME/.config/nvim/init.lua
 
 sudo apt install python3 -y
 pip3 install pynvim
