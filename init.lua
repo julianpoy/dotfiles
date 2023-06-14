@@ -550,6 +550,8 @@ vim.keymap.set({'n', 'v' }, 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, sil
 
 -- Ctrl+q for lazy quit
 vim.keymap.set({ 'n', 'i', 'v' }, '<C-q>', '<esc>:q<CR>')
+-- Ctrl+s for lazy save
+vim.keymap.set({ 'n' }, '<C-s>', '<esc>:w<CR>')
 
 -- Keep visual block highlighted during indent
 vim.keymap.set('v', '>', '>gv')
