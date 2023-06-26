@@ -234,6 +234,15 @@ require('lazy').setup({
   },
 
   {
+    'Pocco81/auto-save.nvim',
+    config = function()
+      require("auto-save").setup {
+        enabled = true
+      }
+    end,
+  },
+
+  {
     'nvim-tree/nvim-tree.lua',
     config = function()
       local function on_attach(bufnr)
