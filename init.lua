@@ -50,7 +50,7 @@ require('lazy').setup({
 
       -- Useful status updates for LSP
       -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
-      { 'j-hui/fidget.nvim', opts = {} },
+      { 'j-hui/fidget.nvim', opts = {}, tag = 'legacy' },
 
       -- Additional lua configuration, makes nvim stuff amazing!
       'folke/neodev.nvim',
@@ -60,6 +60,7 @@ require('lazy').setup({
   { -- Autocompletion
     'hrsh7th/nvim-cmp',
     dependencies = {
+      'hrsh7th/cmp-path',
       'hrsh7th/cmp-nvim-lsp',
       'L3MON4D3/LuaSnip',
       'saadparwaiz1/cmp_luasnip',
@@ -67,9 +68,34 @@ require('lazy').setup({
     },
   },
 
+  -- {
+  --   'tzachar/cmp-tabnine',
+  --   build = './install.sh',
+  --   dependencies = 'hrsh7th/nvim-cmp',
+  --   config = function()
+  --     local tabnine = require('cmp_tabnine.config')
+  --
+  --     tabnine:setup({
+  --       max_lines = 1000,
+  --       max_num_results = 20,
+  --       sort = true,
+  --       run_on_every_keystroke = true,
+  --       snippet_placeholder = '..',
+  --       ignored_file_types = {
+  --         -- default is not to ignore
+  --         -- uncomment to ignore in lua:
+  --         -- lua = true
+  --       },
+  --       show_prediction_strength = false
+  --     })
+  --   end
+  -- },
+
   -- Useful plugin to show you pending keybinds.
   { 'folke/which-key.nvim', opts = {} },
-  { -- Adds git releated signs to the gutter, as well as utilities for managing changes
+
+  -- Adds git releated signs to the gutter, as well as utilities for managing changes
+  {
     'lewis6991/gitsigns.nvim',
     opts = {
       -- See `:help gitsigns.txt`
@@ -83,73 +109,7 @@ require('lazy').setup({
     },
   },
 
-  -- {
-  --   'catppuccin/nvim',
-  --   config = function()
-  --     require("catppuccin").setup {
-  --       color_overrides = {
-  --         all = {},
-  --         latte = {
-  --           base = "#ff0000",
-  --           mantle = "#242424",
-  --           crust = "#474747",
-  --         },
-  --         frappe = {},
-  --         macchiato = {},
-  --         mocha = {
-  --           base = "#212020",
-  --           mantle = "#212020",
-  --           crust = "#212020"
-  --         },
-  --       }
-  --     }
-  --     vim.cmd.colorscheme 'catppuccin-mocha'
-  --   end,
-  --   lazy = false,
-  --   priority = 1000,
-  -- },
-  
-  -- {
-  --   'sainnhe/gruvbox-material',
-  --   config = function()
-  --     vim.o.background = "dark"
-  --     vim.g.gruvbox_material_foreground = 'original'
-  --     vim.g.gruvbox_material_background = 'hard'
-  --     vim.cmd.colorscheme 'gruvbox-material'
-  --   end,
-  --   lazy = false,
-  --   priority = 1000
-  -- },
-  -- {
-  --   'ellisonleao/gruvbox.nvim',
-  --   config = function()
-  --     vim.o.background = "dark"
-  --     require("gruvbox").setup({
-  --       contrast = "hard"
-  --     })
-  --     vim.cmd.colorscheme 'gruvbox'
-  --   end,
-  --   lazy = false,
-  --   priority = 1000
-  -- },
-  -- {
-  --   'sainnhe/sonokai',
-  --   config = function()
-  --     vim.o.background = "dark"
-  --     vim.cmd.colorscheme 'sonokai'
-  --   end,
-  --   lazy = false,
-  --   priority = 1000
-  -- },
-  -- {
-  --   'lifepillar/vim-gruvbox8',
-  --   config = function()
-  --     vim.o.background = "dark"
-  --     vim.cmd.colorscheme 'gruvbox8_hard'
-  --   end,
-  --   lazy = false,
-  --   priority = 1000
-  -- },
+  -- Syntax theme
   {
     'rebelot/kanagawa.nvim',
     config = function()
@@ -193,7 +153,8 @@ require('lazy').setup({
     priority = 1000
   },
 
-  { -- Set lualine as statusline
+  -- Pretty statusline that shows mode and file info
+  {
     'nvim-lualine/lualine.nvim',
     -- See `:help lualine.txt`
     opts = {
@@ -206,7 +167,8 @@ require('lazy').setup({
     },
   },
 
-  { -- Add indentation guides even on blank lines
+  -- Add indentation guides even on blank lines
+  {
     'lukas-reineke/indent-blankline.nvim',
     -- Enable `lukas-reineke/indent-blankline.nvim`
     -- See `:help indent_blankline.txt`
@@ -220,11 +182,13 @@ require('lazy').setup({
   --   'tpope/vim-surround'
   -- },
 
-  { -- Multiple cursors with <C-n>
+  -- Multiple cursors with <C-n>
+  {
     'mg979/vim-visual-multi'
   },
 
-  { -- Powerful search
+  -- Powerful search
+  {
     'windwp/nvim-spectre',
     config = function()
       local api = require('spectre')
@@ -233,6 +197,7 @@ require('lazy').setup({
     dependencies = { 'nvim-lua/plenary.nvim' }
   },
 
+  -- Save when exiting insert mode
   {
     'Pocco81/auto-save.nvim',
     config = function()
@@ -242,6 +207,7 @@ require('lazy').setup({
     end,
   },
 
+  -- A tree with a very good experience
   {
     'nvim-tree/nvim-tree.lua',
     config = function()
@@ -391,12 +357,13 @@ require('lazy').setup({
     end,
   },
 
-  -- "gc" to comment visual regions/lines
+  -- Native feeling comment operations - use "gc" to comment visual regions/lines
   { 'numToStr/Comment.nvim', opts = {} },
 
   -- Fuzzy Finder (files, lsp, etc)
   { 'nvim-telescope/telescope.nvim', version = '*', dependencies = { 'nvim-lua/plenary.nvim' } },
-  -- {'nvim-telescope/telescope-ui-select.nvim', dependencies = { 'nvim-telescope/telescope.nvim' } },
+
+  -- Use vim inputs and selects instead of status line prompts
   {
     'stevearc/dressing.nvim',
     opts = {},
@@ -415,7 +382,8 @@ require('lazy').setup({
     end,
   },
 
-  { -- Highlight, edit, and navigate code
+  -- Highlight, edit, and navigate code
+  {
     'nvim-treesitter/nvim-treesitter',
     dependencies = {
       'nvim-treesitter/nvim-treesitter-textobjects',
@@ -424,6 +392,7 @@ require('lazy').setup({
     build = ":TSUpdate",
   },
 
+  -- Built-in debugger
   {
     'mfussenegger/nvim-dap',
     dependencies = {
@@ -499,8 +468,8 @@ require('lazy').setup({
 }, {
   checker = {
     -- automatically check for plugin updates
-    enabled = true,
-    notify = true, -- get a notification when new updates are found
+    enabled = false,
+    notify = false, -- get a notification when new updates are found
     frequency = 3600, -- check for updates every hour
   },
 })
@@ -731,6 +700,11 @@ require('nvim-treesitter.configs').setup {
   },
 }
 
+-- [[ Fold based on TreeSitter ]]
+vim.opt.foldmethod = 'expr'
+vim.opt.foldexpr = 'nvim_treesitter#foldexpr()'
+vim.opt.foldlevel = 99
+
 -- Diagnostic keymaps
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = "Go to previous [d]iagnostic message" })
 vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = "Go to next [d]iagnostic message" })
@@ -760,7 +734,7 @@ local on_attach = function(_, bufnr)
   -- See `:help K` for why this keymap
   map('n', '<leader>h', vim.lsp.buf.hover, 'Hover Documentation')
   map({ 'n', 'i' }, '<C-h>', vim.lsp.buf.signature_help, 'Signature Documentation') -- TODO: potentially remap this
- 
+
   -- TODO: potentially remove this
   -- Lesser used LSP functionality
   map('n', 'gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
@@ -918,10 +892,12 @@ cmp.setup {
   --   { name = 'luasnip' },
   -- },
   sources = cmp.config.sources({
+    -- { name = 'cmp_tabnine' },
     { name = 'nvim_lsp' },
     { name = 'luasnip' },
   }, {
     { name = 'buffer' },
+    { name = 'path' }
   })
 }
 
