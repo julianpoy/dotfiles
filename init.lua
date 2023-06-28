@@ -64,7 +64,23 @@ require('lazy').setup({
       'hrsh7th/cmp-nvim-lsp',
       'L3MON4D3/LuaSnip',
       'saadparwaiz1/cmp_luasnip',
-      'ray-x/lsp_signature.nvim'
+      {
+        'ray-x/lsp_signature.nvim',
+        config = function()
+          require "lsp_signature".setup({
+            -- floating_window = false,
+            hint_enable = false,
+            -- fix_pos = true,
+            -- toggle_key = '<C-h>',
+            hi_parameter = "LspSignatureActiveParameter",
+            handler_opts = {
+              border = "none"
+            },
+            doc_lines = 0,
+            padding = ' '
+          })
+        end
+      }
     },
   },
 
@@ -90,6 +106,15 @@ require('lazy').setup({
   --     })
   --   end
   -- },
+
+  -- :Trouble for showing typescript errors
+  {
+    "folke/trouble.nvim",
+    lazy = true,
+    opts = {
+      icons = false
+    }
+  },
 
   -- Useful plugin to show you pending keybinds.
   { 'folke/which-key.nvim', opts = {} },
@@ -900,14 +925,6 @@ cmp.setup {
     { name = 'path' }
   })
 }
-
-require "lsp_signature".setup({
-  floating_window = false,
-  hint_enable = false,
-  fix_pos = true,
-  toggle_key = '<C-h>',
-  hi_parameter = "LspSignatureActiveParameter",
-})
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
