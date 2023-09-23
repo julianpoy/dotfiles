@@ -1,17 +1,17 @@
 #!/bin/bash
 
-# Wget for various fetching
-sudo apt install -y wget curl
+# Essentials
+sudo apt-get install -y curl gcc
 
 # Fish
 sudo apt-add-repository ppa:fish-shell/release-3 -y
-sudo apt update
-sudo apt install fish -y
-sudo apt install fonts-powerline -y
+sudo apt-get update
+sudo apt-get install fish -y
+sudo apt-get install fonts-powerline -y
 sudo chsh -s /usr/bin/fish $USER
 fish -c "curl -sL https://git.io/fisher | source && fisher install jorgebucaran/fisher"
 fish -c "fisher install oh-my-fish/theme-bobthefish"
-wget $DOTFILES_URI/raw/master/fish-aliases.sh -O /tmp/fish-aliases.sh
+curl $DOTFILES_URI/raw/master/fish-aliases.sh -o /tmp/fish-aliases.sh
 fish -c "fish /tmp/fish-aliases.sh"
 
 # NVM
@@ -21,27 +21,28 @@ fish -c "set --universal nvm_default_version 18"
 fish -c "set --universal nvm_default_packages yarn neovim"
 
 # NeoVim
-wget https://github.com/neovim/neovim/releases/download/v0.9.1/nvim.appimage -O ~/nvim.appimage 
+curl https://github.com/neovim/neovim/releases/download/v0.9.1/nvim.appimage -o ~/nvim.appimage
 chmod +x ~/nvim.appimage
 cd ~
 ~/nvim.appimage --appimage-extract
 fish -c "alias vim='~/squashfs-root/usr/bin/nvim' && funcsave vim"
 
 mkdir -p $HOME/.config/nvim
-wget $DOTFILES_URI/raw/master/init.lua -O $HOME/.config/nvim/init.lua
+curl $DOTFILES_URI/raw/master/init.lua -o $HOME/.config/nvim/init.lua
 
-sudo apt install python3 -y
+sudo apt-get install python3 python3-pip -y
+sudo apt-get install python3 -y
 pip3 install pynvim
 
-sudo apt install ripgrep -y
-sudo apt install fd-find -y
+sudo apt-get install ripgrep -y
+sudo apt-get install fd-find -y
 
 nvim --headless +PlugInstall +qall
 
 # Tmux
-sudo apt install tmux -y
-wget $DOTFILES_URI/raw/master/.tmux.conf -O $HOME/.tmux.conf
+sudo apt-get install tmux -y
+curl $DOTFILES_URI/raw/master/.tmux.conf -o $HOME/.tmux.conf
 
 # Other Utils
-sudo apt install netcat -y
+sudo apt-get install netcat -y
 
