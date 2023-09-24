@@ -40,3 +40,6 @@ sudo apt-get install fd-find -y
 # Tmux
 sudo apt-get install tmux -y
 curl -sL $DOTFILES_URI/raw/master/.tmux.conf -o $HOME/.tmux.conf
+
+# Other
+sudo apt-get install -y htop
