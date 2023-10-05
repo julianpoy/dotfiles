@@ -224,14 +224,14 @@ require('lazy').setup({
   },
 
   -- Save when exiting insert mode
-  {
-    'Pocco81/auto-save.nvim',
-    config = function()
-      require("auto-save").setup {
-        enabled = true
-      }
-    end,
-  },
+  -- {
+  --   'Pocco81/auto-save.nvim',
+  --   config = function()
+  --     require("auto-save").setup {
+  --       enabled = true
+  --     }
+  --   end,
+  -- },
 
   -- A tree with a very good experience
   {
