@@ -21,11 +21,12 @@ fish -c "set --universal nvm_default_version 18"
 fish -c "set --universal nvm_default_packages yarn neovim"
 
 # NeoVim
-curl -sL https://github.com/neovim/neovim/releases/download/v0.9.1/nvim.appimage -o ~/nvim.appimage
-chmod +x ~/nvim.appimage
-cd ~
-~/nvim.appimage --appimage-extract
-fish -c "alias vim='~/squashfs-root/usr/bin/nvim' && funcsave vim"
+mkdir ~/.neovim-bin
+curl -sL https://github.com/neovim/neovim/releases/download/v0.9.1/nvim.appimage -o ~/.neovim-bin/nvim.appimage
+chmod +x ~/.neovim-bin/nvim.appimage
+cd ~/.neovim-bin
+~/.neovim-bin/nvim.appimage --appimage-extract
+fish -c "alias vim='~/.neovim-bin/squashfs-root/usr/bin/nvim' && funcsave vim"
 
 mkdir -p $HOME/.config/nvim
 curl -sL $DOTFILES_URI/raw/master/init.lua -o $HOME/.config/nvim/init.lua
