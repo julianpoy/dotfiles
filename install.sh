@@ -2,6 +2,7 @@
 
 # Essentials
 sudo apt-get install -y curl gcc jq htop tmux vim
+sudo apt-get install -y netcat || sudo apt-get install -y netcat-openbsd
 
 # Fish
 sudo apt-get install fish fonts-powerline -y
