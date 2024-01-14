@@ -4,7 +4,8 @@ sudo apt-get install -y \
   curl gcc jq zip unzip htop tmux vim python3 python3-pip \
   python3-pynvim \
   fish fonts-powerline \
-  ripgrep fd-find
+  ripgrep fd-find \
+  gh
 
 sudo apt-get install -y netcat || sudo apt-get install -y netcat-openbsd
 
