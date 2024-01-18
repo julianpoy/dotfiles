@@ -39,3 +39,6 @@ curl -sL $DOTFILES_URI/raw/master/.tmux.conf -o $HOME/.tmux.conf
 # Ngrok
 curl -sL https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz -o /tmp/ngrok-v3-stable-linux-amd64.tgz
 sudo tar xvzf /tmp/ngrok-v3-stable-linux-amd64.tgz -C /usr/local/bin
+
+# Git config
+git config --global --add --bool push.autoSetupRemote true
