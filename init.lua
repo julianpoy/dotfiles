@@ -927,5 +927,10 @@ cmp.setup {
   })
 }
 
+vim.keymap.set('t', '<C-w>h', "<C-\\><C-n><C-w>h",{silent = true})
+vim.keymap.set('t', '<C-w>j', "<C-\\><C-n><C-w>j",{silent = true})
+vim.keymap.set('t', '<C-w>k', "<C-\\><C-n><C-w>k",{silent = true})
+vim.keymap.set('t', '<C-w>l', "<C-\\><C-n><C-w>l",{silent = true})
+
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
