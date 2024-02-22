@@ -333,6 +333,7 @@ require('lazy').setup({
         },
         view = {
           adaptive_size = false,
+          preserve_window_proportions = true,
         },
         renderer = {
           add_trailing = true,
@@ -926,6 +927,8 @@ cmp.setup {
     { name = 'path' }
   })
 }
+
+vim.o.equalalways = false
 
 vim.keymap.set('t', '<C-w>h', "<C-\\><C-n><C-w>h",{silent = true})
 vim.keymap.set('t', '<C-w>j', "<C-\\><C-n><C-w>j",{silent = true})
