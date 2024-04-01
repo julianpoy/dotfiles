@@ -18,9 +18,9 @@ fish -c "fish /tmp/fish-aliases.sh"
 
 # NVM
 fish -c "fisher install jorgebucaran/nvm.fish"
-fish -c "set --universal nvm_default_version 18"
+fish -c "set --universal nvm_default_version 20"
 fish -c "set --universal nvm_default_packages yarn nx neovim typescript"
-fish -c "nvm install 18"
+fish -c "nvm install 20"
 
 # NeoVim
 mkdir ~/.neovim-bin
