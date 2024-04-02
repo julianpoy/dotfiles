@@ -1,5 +1,7 @@
 #!/bin/bash
 
+DOTFILES_URI=${DOTFILES_URI:-https://github.com/julianpoy/dotfiles}
+
 sudo apt-get update
 
 sudo apt-get install -y \
