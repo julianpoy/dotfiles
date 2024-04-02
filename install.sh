@@ -1,5 +1,7 @@
 #!/bin/bash
 
+sudo apt-get update
+
 sudo apt-get install -y \
   curl gcc jq zip unzip htop tmux vim python3 python3-pip \
   python3-pynvim \
