@@ -28,7 +28,7 @@ fish -c "nvm install 20"
 
 # NeoVim
 mkdir ~/.neovim-bin
-curl -sL https://github.com/neovim/neovim/releases/download/v0.9.1/nvim.appimage -o ~/.neovim-bin/nvim.appimage
+curl -sL https://github.com/neovim/neovim/releases/download/v0.9.5/nvim.appimage -o ~/.neovim-bin/nvim.appimage
 chmod +x ~/.neovim-bin/nvim.appimage
 cd ~/.neovim-bin
 ~/.neovim-bin/nvim.appimage --appimage-extract
