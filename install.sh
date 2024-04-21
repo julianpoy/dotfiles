@@ -27,6 +27,7 @@ fish -c "set --universal nvm_default_packages yarn nx neovim typescript"
 fish -c "nvm install 20"
 
 # NeoVim
+rm -rf ~/.neovim-bin
 mkdir ~/.neovim-bin
 curl -sL https://github.com/neovim/neovim/releases/download/v0.9.5/nvim.appimage -o ~/.neovim-bin/nvim.appimage
 chmod +x ~/.neovim-bin/nvim.appimage
