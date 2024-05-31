@@ -39,8 +39,27 @@ require('lazy').setup({
   -- Detect tabstop and shiftwidth automatically
   'tpope/vim-sleuth',
 
-  -- NOTE: This is where your plugins related to LSP can be installed.
-  --  The configuration is done below. Search for lspconfig to find it below.
+  {
+    "zbirenbaum/copilot.lua",
+    cmd = "Copilot",
+    event = "InsertEnter",
+    config = function()
+      require("copilot").setup({
+        suggestion = {
+          auto_trigger = true,
+          keymap = {
+            accept = "<M-a>",
+            accept_line = "<M-l>",
+            accept_word = "<M-w>",
+            next = "<M-n>",
+            prev = "<M-N>",
+            dismiss = "<M-d>",
+          },
+        },
+      })
+    end,
+  },
+
   { -- LSP Configuration & Plugins
     'neovim/nvim-lspconfig',
     dependencies = {
@@ -49,11 +68,7 @@ require('lazy').setup({
       'williamboman/mason-lspconfig.nvim',
 
       -- Useful status updates for LSP
-      -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
-      { 'j-hui/fidget.nvim', opts = {}, tag = 'legacy' },
-
-      -- Additional lua configuration, makes nvim stuff amazing!
-      'folke/neodev.nvim',
+      { 'j-hui/fidget.nvim', opts = {} },
     },
   },
 
@@ -62,58 +77,44 @@ require('lazy').setup({
     dependencies = {
       'hrsh7th/cmp-path',
       'hrsh7th/cmp-nvim-lsp',
-      'L3MON4D3/LuaSnip',
-      'saadparwaiz1/cmp_luasnip',
-      {
-        'ray-x/lsp_signature.nvim',
-        config = function()
-          require "lsp_signature".setup({
-            -- floating_window = false,
-            hint_enable = false,
-            -- fix_pos = true,
-            -- toggle_key = '<C-h>',
-            hi_parameter = "LspSignatureActiveParameter",
-            handler_opts = {
-              border = "none"
-            },
-            doc_lines = 0,
-            padding = ' '
-          })
-        end
-      }
     },
   },
 
-  -- {
-  --   'tzachar/cmp-tabnine',
-  --   build = './install.sh',
-  --   dependencies = 'hrsh7th/nvim-cmp',
-  --   config = function()
-  --     local tabnine = require('cmp_tabnine.config')
-  --
-  --     tabnine:setup({
-  --       max_lines = 1000,
-  --       max_num_results = 20,
-  --       sort = true,
-  --       run_on_every_keystroke = true,
-  --       snippet_placeholder = '..',
-  --       ignored_file_types = {
-  --         -- default is not to ignore
-  --         -- uncomment to ignore in lua:
-  --         -- lua = true
-  --       },
-  --       show_prediction_strength = false
-  --     })
-  --   end
-  -- },
-
-  -- :Trouble for showing typescript errors
-  {
-    "folke/trouble.nvim",
-    lazy = true,
+    { -- Autoformat
+    'stevearc/conform.nvim',
+    lazy = false,
+    keys = {
+      {
+        '<leader>f',
+        function()
+          require('conform').format { async = true, lsp_fallback = true }
+        end,
+        mode = '',
+        desc = '[F]ormat buffer',
+      },
+    },
     opts = {
-      icons = false
-    }
+      notify_on_error = false,
+      format_on_save = function(bufnr)
+        -- Disable "format_on_save lsp_fallback" for languages that don't
+        -- have a well standardized coding style. You can add additional
+        -- languages here or re-enable it for the disabled ones.
+        local disable_filetypes = { c = true, cpp = true }
+        return {
+          timeout_ms = 500,
+          lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
+        }
+      end,
+      formatters_by_ft = {
+        lua = { 'stylua' },
+        -- Conform can also run multiple formatters sequentially
+        -- python = { "isort", "black" },
+        --
+        -- You can use a sub-list to tell conform to run *until* a formatter
+        -- is found.
+        -- javascript = { { "prettierd", "prettier" } },
+      },
+    },
   },
 
   -- Useful plugin to show you pending keybinds.
@@ -195,13 +196,20 @@ require('lazy').setup({
   -- Add indentation guides even on blank lines
   {
     'lukas-reineke/indent-blankline.nvim',
-    -- Enable `lukas-reineke/indent-blankline.nvim`
-    -- See `:help indent_blankline.txt`
-    tag = "v2.20.8",
-    opts = {
-      char = '┊',
-      show_trailing_blankline_indent = false,
-    },
+    tag = "v3.6.2",
+    config = function()
+      require("ibl").setup {
+        indent = {
+          char = "┊"
+        },
+        whitespace = {
+          remove_blankline_trail = true,
+        },
+        scope = {
+          enabled = false,
+        },
+      }
+    end
   },
 
   -- { -- Easy editing movements for quotes, parenthesis, etc
@@ -210,7 +218,8 @@ require('lazy').setup({
 
   -- Multiple cursors with <C-n>
   {
-    'mg979/vim-visual-multi'
+    'mg979/vim-visual-multi',
+    tag = "v0.5.8",
   },
 
   -- Powerful search
@@ -236,6 +245,7 @@ require('lazy').setup({
   -- A tree with a very good experience
   {
     'nvim-tree/nvim-tree.lua',
+    tag = "v1.3.3",
     config = function()
       local function on_attach(bufnr)
         local api = require('nvim-tree.api')
@@ -409,13 +419,9 @@ require('lazy').setup({
     end,
   },
 
-  -- Highlight, edit, and navigate code
+  -- Highligh code
   {
     'nvim-treesitter/nvim-treesitter',
-    dependencies = {
-      'nvim-treesitter/nvim-treesitter-textobjects',
-      'nvim-treesitter/playground',
-    },
     build = ":TSUpdate",
   },
 
@@ -507,8 +513,8 @@ require('lazy').setup({
 -- [[ Setting options ]]
 -- See `:help vim.o`
 
--- Set highlight on search
-vim.o.hlsearch = false
+-- Do not show highlight for search results
+vim.opt.hlsearch = false
 
 -- Make line numbers default (hybrid)
 vim.wo.number = true
@@ -546,6 +552,9 @@ vim.o.completeopt = 'menuone,noselect'
 -- NOTE: You should make sure your terminal supports this
 vim.o.termguicolors = true
 
+-- Preserve some lines below the cursor
+vim.opt.scrolloff = 5
+
 -- [[ Basic Keymaps ]]
 
 -- Keymaps for better default experience
@@ -582,13 +591,12 @@ vim.keymap.set({'n', 'v', 'i'}, '<ScrollWheelDown>', '<C-E>', { silent = true })
 
 -- [[ Highlight on yank ]]
 -- See `:help vim.highlight.on_yank()`
-local highlight_group = vim.api.nvim_create_augroup('YankHighlight', { clear = true })
 vim.api.nvim_create_autocmd('TextYankPost', {
+  desc = 'Highlight when yanking (copying) text',
+  group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
   callback = function()
     vim.highlight.on_yank()
   end,
-  group = highlight_group,
-  pattern = '*',
 })
 
 -- [[ Configure Telescope ]]
@@ -676,56 +684,12 @@ require('nvim-treesitter.configs').setup {
     -- disable = { 'python' }
   },
   incremental_selection = {
-    enable = true,
+    enable = false, -- Perhaps play with in the future, but not useful for now
     keymaps = {
       init_selection = '<c-space>',
       node_incremental = '<c-space>',
       scope_incremental = '<c-s>',
       node_decremental = '<M-space>',
-    },
-  },
-  textobjects = {
-    select = {
-      enable = true,
-      lookahead = true, -- Automatically jump forward to textobj, similar to targets.vim
-      keymaps = {
-        -- You can use the capture groups defined in textobjects.scm
-        ['aa'] = '@parameter.outer',
-        ['ia'] = '@parameter.inner',
-        ['af'] = '@function.outer',
-        ['if'] = '@function.inner',
-        ['ac'] = '@class.outer',
-        ['ic'] = '@class.inner',
-      },
-    },
-    move = {
-      enable = true,
-      set_jumps = true, -- whether to set jumps in the jumplist
-      goto_next_start = {
-        [']m'] = '@function.outer',
-        [']]'] = '@class.outer',
-      },
-      goto_next_end = {
-        [']M'] = '@function.outer',
-        [']['] = '@class.outer',
-      },
-      goto_previous_start = {
-        ['[m'] = '@function.outer',
-        ['[['] = '@class.outer',
-      },
-      goto_previous_end = {
-        ['[M'] = '@function.outer',
-        ['[]'] = '@class.outer',
-      },
-    },
-    swap = {
-      enable = true,
-      swap_next = {
-        ['<leader>a'] = '@parameter.inner',
-      },
-      swap_previous = {
-        ['<leader>A'] = '@parameter.inner',
-      },
     },
   },
 }
@@ -820,13 +784,6 @@ local servers = {
   -- pyright = {},
   -- rust_analyzer = {},
   tsserver = {},
-
-  lua_ls = {
-    Lua = {
-      workspace = { checkThirdParty = false },
-      telemetry = { enable = false },
-    },
-  },
 }
 
 local handlers =  {
@@ -839,9 +796,6 @@ vim.diagnostic.config({
   virtual_text = false,
   underline = true
 })
-
--- Setup neovim lua configuration
-require('neodev').setup()
 
 -- nvim-cmp supports additional completion capabilities, so broadcast that to servers
 local capabilities = vim.lsp.protocol.make_client_capabilities()
@@ -867,17 +821,12 @@ mason_lspconfig.setup_handlers {
 
 -- nvim-cmp setup
 local cmp = require 'cmp'
-local luasnip = require 'luasnip'
-
-luasnip.config.setup {}
 
 cmp.setup {
-  preselect = cmp.PreselectMode.None,
-  snippet = {
-    expand = function(args)
-      luasnip.lsp_expand(args.body)
-    end,
+  performance = {
+    max_view_entries = 10,
   },
+  preselect = cmp.PreselectMode.None,
   -- window = {
   --   completion = cmp.config.window.bordered(),
   --   documentation = cmp.config.window.bordered(),
@@ -901,8 +850,6 @@ cmp.setup {
     ['<Tab>'] = cmp.mapping(function(fallback)
       if cmp.visible() then
         cmp.select_next_item()
-      elseif luasnip.expand_or_jumpable() then
-        luasnip.expand_or_jump()
       else
         fallback()
       end
@@ -910,23 +857,15 @@ cmp.setup {
     ['<S-Tab>'] = cmp.mapping(function(fallback)
       if cmp.visible() then
         cmp.select_prev_item()
-      elseif luasnip.jumpable(-1) then
-        luasnip.jump(-1)
       else
         fallback()
       end
     end, { 'i', 's' }),
   },
-  -- sources = {
-  --   { name = 'nvim_lsp' },
-  --   { name = 'luasnip' },
-  -- },
   sources = cmp.config.sources({
-    -- { name = 'cmp_tabnine' },
     { name = 'nvim_lsp' },
-    { name = 'luasnip' },
   }, {
-    { name = 'buffer' },
+    -- { name = 'buffer' },
     { name = 'path' }
   })
 }
