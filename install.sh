@@ -29,11 +29,9 @@ fish -c "nvm install 20"
 # NeoVim
 rm -rf ~/.neovim-bin
 mkdir ~/.neovim-bin
-curl -sL https://github.com/neovim/neovim/releases/download/v0.9.5/nvim.appimage -o ~/.neovim-bin/nvim.appimage
-chmod +x ~/.neovim-bin/nvim.appimage
-cd ~/.neovim-bin
-~/.neovim-bin/nvim.appimage --appimage-extract
-fish -c "alias vim='~/.neovim-bin/squashfs-root/usr/bin/nvim' && funcsave vim"
+wget https://github.com/neovim/neovim/releases/download/v0.10.0/nvim-linux64.tar.gz -O ~/.neovim-bin/nvim-linux64.tar.gz
+sudo tar -C ~/.neovim-bin -xzf ~/.neovim-bin/nvim-linux64.tar.gz
+fish -c "alias vim='~/.neovim-bin/nvim-linux64/bin/nvim' && funcsave vim"
 
 mkdir -p $HOME/.config/nvim
 curl -sL $DOTFILES_URI/raw/master/init.lua -o $HOME/.config/nvim/init.lua
