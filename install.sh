@@ -26,6 +26,9 @@ fish -c "set --universal nvm_default_version 20"
 fish -c "set --universal nvm_default_packages yarn nx neovim typescript"
 fish -c "nvm install 20"
 
+# Nx
+fish -c "set -Ux NX_REJECT_UNKNOWN_LOCAL_CACHE 0"
+
 # NeoVim
 rm -rf ~/.neovim-bin
 mkdir ~/.neovim-bin
