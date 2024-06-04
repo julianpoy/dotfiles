@@ -68,7 +68,10 @@ require('lazy').setup({
       'williamboman/mason-lspconfig.nvim',
 
       -- Useful status updates for LSP
-      { 'j-hui/fidget.nvim', opts = {} },
+      {
+        'j-hui/fidget.nvim',
+        opts = {}
+      },
     },
   },
 
@@ -80,7 +83,7 @@ require('lazy').setup({
     },
   },
 
-    { -- Autoformat
+  { -- Autoformat
     'stevearc/conform.nvim',
     lazy = false,
     keys = {
@@ -95,30 +98,14 @@ require('lazy').setup({
     },
     opts = {
       notify_on_error = false,
-      format_on_save = function(bufnr)
-        -- Disable "format_on_save lsp_fallback" for languages that don't
-        -- have a well standardized coding style. You can add additional
-        -- languages here or re-enable it for the disabled ones.
-        local disable_filetypes = { c = true, cpp = true }
-        return {
-          timeout_ms = 500,
-          lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
-        }
-      end,
-      formatters_by_ft = {
-        lua = { 'stylua' },
-        -- Conform can also run multiple formatters sequentially
-        -- python = { "isort", "black" },
-        --
-        -- You can use a sub-list to tell conform to run *until* a formatter
-        -- is found.
-        -- javascript = { { "prettierd", "prettier" } },
-      },
     },
   },
 
   -- Useful plugin to show you pending keybinds.
-  { 'folke/which-key.nvim', opts = {} },
+  {
+    'folke/which-key.nvim',
+    opts = {}
+  },
 
   -- Adds git releated signs to the gutter, as well as utilities for managing changes
   {
@@ -148,7 +135,7 @@ require('lazy').setup({
         colors = {
           palette = {
             sumiInk0 = "#1d2021", -- Statuslines and floating windows background
-            sumiInk1 = "#282828", -- 
+            sumiInk1 = "#282828", --
             sumiInk2 = "#3c3836",
             sumiInk3 = "#141617", -- Normal bg
             sumiInk4 = "#504945",
@@ -242,115 +229,47 @@ require('lazy').setup({
   --   end,
   -- },
 
-  -- A tree with a very good experience
   {
     'nvim-tree/nvim-tree.lua',
-    tag = "v1.3.3",
+    opts = {
+    },
     config = function()
-      local function on_attach(bufnr)
-        local api = require('nvim-tree.api')
+      local HEIGHT_RATIO = 0.8
+      local WIDTH_RATIO = 0.5
 
-        local function opts(desc)
-          return { desc = 'nvim-tree: ' .. desc, buffer = bufnr, noremap = true, silent = true, nowait = true }
-        end
-
-
-        -- Default mappings. Feel free to modify or remove as you wish.
-        --
-        -- BEGIN_DEFAULT_ON_ATTACH
-        vim.keymap.set('n', '<C-]>', api.tree.change_root_to_node,          opts('CD'))
-        vim.keymap.set('n', '<C-e>', api.node.open.replace_tree_buffer,     opts('Open: In Place'))
-        vim.keymap.set('n', '<C-k>', api.node.show_info_popup,              opts('Info'))
-        vim.keymap.set('n', '<C-r>', api.fs.rename_sub,                     opts('Rename: Omit Filename'))
-        vim.keymap.set('n', '<C-t>', api.node.open.tab,                     opts('Open: New Tab'))
-        vim.keymap.set('n', '<C-v>', api.node.open.vertical,                opts('Open: Vertical Split'))
-        vim.keymap.set('n', '<C-x>', api.node.open.horizontal,              opts('Open: Horizontal Split'))
-        vim.keymap.set('n', '<BS>',  api.node.navigate.parent_close,        opts('Close Directory'))
-        vim.keymap.set('n', '<CR>',  api.node.open.edit,                    opts('Open'))
-        vim.keymap.set('n', '<Tab>', api.node.open.preview,                 opts('Open Preview'))
-        vim.keymap.set('n', '>',     api.node.navigate.sibling.next,        opts('Next Sibling'))
-        vim.keymap.set('n', '<',     api.node.navigate.sibling.prev,        opts('Previous Sibling'))
-        vim.keymap.set('n', '.',     api.node.run.cmd,                      opts('Run Command'))
-        vim.keymap.set('n', '-',     api.tree.change_root_to_parent,        opts('Up'))
-        vim.keymap.set('n', 'a',     api.fs.create,                         opts('Create'))
-        vim.keymap.set('n', 'bmv',   api.marks.bulk.move,                   opts('Move Bookmarked'))
-        vim.keymap.set('n', 'B',     api.tree.toggle_no_buffer_filter,      opts('Toggle No Buffer'))
-        vim.keymap.set('n', 'c',     api.fs.copy.node,                      opts('Copy'))
-        vim.keymap.set('n', 'C',     api.tree.toggle_git_clean_filter,      opts('Toggle Git Clean'))
-        vim.keymap.set('n', '[c',    api.node.navigate.git.prev,            opts('Prev Git'))
-        vim.keymap.set('n', ']c',    api.node.navigate.git.next,            opts('Next Git'))
-        vim.keymap.set('n', 'd',     api.fs.remove,                         opts('Delete'))
-        vim.keymap.set('n', 'D',     api.fs.trash,                          opts('Trash'))
-        vim.keymap.set('n', 'E',     api.tree.expand_all,                   opts('Expand All'))
-        vim.keymap.set('n', 'e',     api.fs.rename_basename,                opts('Rename: Basename'))
-        vim.keymap.set('n', ']e',    api.node.navigate.diagnostics.next,    opts('Next Diagnostic'))
-        vim.keymap.set('n', '[e',    api.node.navigate.diagnostics.prev,    opts('Prev Diagnostic'))
-        vim.keymap.set('n', 'F',     api.live_filter.clear,                 opts('Clean Filter'))
-        vim.keymap.set('n', 'f',     api.live_filter.start,                 opts('Filter'))
-        vim.keymap.set('n', 'g?',    api.tree.toggle_help,                  opts('Help'))
-        vim.keymap.set('n', 'gy',    api.fs.copy.absolute_path,             opts('Copy Absolute Path'))
-        vim.keymap.set('n', 'H',     api.tree.toggle_hidden_filter,         opts('Toggle Dotfiles'))
-        vim.keymap.set('n', 'I',     api.tree.toggle_gitignore_filter,      opts('Toggle Git Ignore'))
-        vim.keymap.set('n', 'J',     api.node.navigate.sibling.last,        opts('Last Sibling'))
-        vim.keymap.set('n', 'K',     api.node.navigate.sibling.first,       opts('First Sibling'))
-        vim.keymap.set('n', 'm',     api.marks.toggle,                      opts('Toggle Bookmark'))
-        vim.keymap.set('n', 'o',     api.node.open.edit,                    opts('Open'))
-        vim.keymap.set('n', 'O',     api.node.open.no_window_picker,        opts('Open: No Window Picker'))
-        vim.keymap.set('n', 'p',     api.fs.paste,                          opts('Paste'))
-        vim.keymap.set('n', 'P',     api.node.navigate.parent,              opts('Parent Directory'))
-        vim.keymap.set('n', 'q',     api.tree.close,                        opts('Close'))
-        vim.keymap.set('n', 'r',     api.fs.rename,                         opts('Rename'))
-        vim.keymap.set('n', 'R',     api.tree.reload,                       opts('Refresh'))
-        vim.keymap.set('n', 's',     api.node.run.system,                   opts('Run System'))
-        vim.keymap.set('n', 'S',     api.tree.search_node,                  opts('Search'))
-        vim.keymap.set('n', 'U',     api.tree.toggle_custom_filter,         opts('Toggle Hidden'))
-        vim.keymap.set('n', 'W',     api.tree.collapse_all,                 opts('Collapse'))
-        vim.keymap.set('n', 'x',     api.fs.cut,                            opts('Cut'))
-        vim.keymap.set('n', 'y',     api.fs.copy.filename,                  opts('Copy Name'))
-        vim.keymap.set('n', 'Y',     api.fs.copy.relative_path,             opts('Copy Relative Path'))
-        vim.keymap.set('n', '<2-LeftMouse>',  api.node.open.edit,           opts('Open'))
-        vim.keymap.set('n', '<2-RightMouse>', api.tree.change_root_to_node, opts('CD'))
-        -- END_DEFAULT_ON_ATTACH
-
-
-        -- Mappings removed via:
-        --   remove_keymaps
-        --   OR
-        --   view.mappings.list..action = ""
-        --
-        -- The dummy set before del is done for safety, in case a default mapping does not exist.
-        --
-        -- You might tidy things by removing these along with their default mapping.
-        vim.keymap.set('n', '<C-e>', '', { buffer = bufnr })
-        vim.keymap.del('n', '<C-e>', { buffer = bufnr })
-
-
-        -- Mappings migrated from view.mappings.list
-        --
-        -- You will need to insert "your code goes here" for any mappings with a custom action_cb
-        vim.keymap.set('n', '%', api.node.open.vertical, opts('Open: Vertical Split'))
-        vim.keymap.set('n', '"', api.node.open.horizontal, opts('Open: Horizontal Split'))
-      end
-
-      require('nvim-tree').setup({
-        on_attach = on_attach,
-        sort_by = "name",
-        git = {
-          ignore = false,
-        },
-        filters = {
-          dotfiles = false,
-        },
+      require('nvim-tree').setup {
+        on_attach = "default",
         view = {
-          adaptive_size = false,
-          preserve_window_proportions = true,
+          relativenumber = true,
+          centralize_selection = true,
+          float = {
+            enable = true,
+            open_win_config = function()
+              local screen_w = vim.opt.columns:get()
+              local screen_h = vim.opt.lines:get() - vim.opt.cmdheight:get()
+              local window_w = screen_w * WIDTH_RATIO
+              local window_h = screen_h * HEIGHT_RATIO
+              local window_w_int = math.floor(window_w)
+              local window_h_int = math.floor(window_h)
+              local center_x = (screen_w - window_w) / 2
+              local center_y = ((vim.opt.lines:get() - window_h) / 2)
+                  - vim.opt.cmdheight:get()
+              return {
+                border = "rounded",
+                relative = "editor",
+                row = center_y,
+                col = center_x,
+                width = window_w_int,
+                height = window_h_int,
+              }
+            end,
+          },
+          width = function()
+            return math.floor(vim.opt.columns:get() * WIDTH_RATIO)
+          end,
         },
         renderer = {
           add_trailing = true,
-          full_name = true,
-          group_empty = false,
-          highlight_git = true,
-          highlight_opened_files = "all",
           icons = {
             webdev_colors = false,
             git_placement = "after",
@@ -378,8 +297,8 @@ require('lazy').setup({
               },
             },
           },
-        },
-      })
+        }
+      }
 
       local function toggle()
         require('nvim-tree.api').tree.toggle({
@@ -390,15 +309,24 @@ require('lazy').setup({
         })
       end
 
-      vim.keymap.set('n', '<leader>t', toggle, { desc = 'Toggle [t]ree' })
+      vim.keymap.set('n', '<leader>t', toggle, { desc = 'File [T]ree' })
     end,
   },
 
   -- Native feeling comment operations - use "gc" to comment visual regions/lines
-  { 'numToStr/Comment.nvim', opts = {} },
+  {
+    'numToStr/Comment.nvim',
+    opts = {}
+  },
 
   -- Fuzzy Finder (files, lsp, etc)
-  { 'nvim-telescope/telescope.nvim', version = '*', dependencies = { 'nvim-lua/plenary.nvim' } },
+  {
+    'nvim-telescope/telescope.nvim',
+    version = '*',
+    dependencies = {
+      'nvim-lua/plenary.nvim'
+    }
+  },
 
   -- Use vim inputs and selects instead of status line prompts
   {
@@ -492,7 +420,7 @@ require('lazy').setup({
       }
       -- toggle to see last session result. Without this, you can't see session output in case of unhandled exception.
       vim.keymap.set("n", "<F7>", dapui.toggle)
-      
+
       dap.listeners.after.event_initialized['dapui_config'] = dapui.open
       dap.listeners.before.event_terminated['dapui_config'] = dapui.close
       dap.listeners.before.event_exited['dapui_config'] = dapui.close
@@ -505,7 +433,7 @@ require('lazy').setup({
   checker = {
     -- automatically check for plugin updates
     enabled = false,
-    notify = false, -- get a notification when new updates are found
+    notify = false,   -- get a notification when new updates are found
     frequency = 3600, -- check for updates every hour
   },
 })
@@ -517,7 +445,6 @@ require('lazy').setup({
 vim.opt.hlsearch = false
 
 -- Make line numbers default (hybrid)
-vim.wo.number = true
 vim.wo.relativenumber = true
 
 -- Enable mouse mode
@@ -549,7 +476,7 @@ vim.o.timeoutlen = 300
 -- Set completeopt to have a better completion experience
 vim.o.completeopt = 'menuone,noselect'
 
--- NOTE: You should make sure your terminal supports this
+-- Enable proper colors
 vim.o.termguicolors = true
 
 -- Preserve some lines below the cursor
@@ -562,8 +489,8 @@ vim.opt.scrolloff = 5
 vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
 
 -- Remap for dealing with word wrap. j and k will move within a wrapped line, unless you're jumping multiple lines
-vim.keymap.set({'n', 'v' }, 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
-vim.keymap.set({'n', 'v' }, 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
+vim.keymap.set({ 'n', 'v' }, 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
+vim.keymap.set({ 'n', 'v' }, 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
 
 -- Ctrl+q for lazy quit
 vim.keymap.set({ 'n', 'i', 'v' }, '<C-q>', '<esc>:q<CR>')
@@ -575,7 +502,7 @@ vim.keymap.set('v', '>', '>gv')
 vim.keymap.set('v', '<', '<gv')
 
 -- Unbind 's' since I don't use it and often miss the space key
-vim.keymap.set({'n', 'v'}, 's', '')
+vim.keymap.set({ 'n', 'v' }, 's', '')
 
 -- Move code vertically with Media+jk
 vim.keymap.set('n', '<A-j>', ':m .+1<CR>==', { silent = true })
@@ -586,8 +513,8 @@ vim.keymap.set('v', '<A-j>', ':m \'>+1<CR>gv=gv', { silent = true })
 vim.keymap.set('v', '<A-k>', ':m \'<-2<CR>gv=gv', { silent = true })
 
 -- Smooth scrolling (scroll one line at a time)
-vim.keymap.set({'n', 'v', 'i'}, '<ScrollWheelUp>', '<C-Y>', { silent = true })
-vim.keymap.set({'n', 'v', 'i'}, '<ScrollWheelDown>', '<C-E>', { silent = true })
+vim.keymap.set({ 'n', 'v', 'i' }, '<ScrollWheelUp>', '<C-Y>', { silent = true })
+vim.keymap.set({ 'n', 'v', 'i' }, '<ScrollWheelDown>', '<C-E>', { silent = true })
 
 -- [[ Highlight on yank ]]
 -- See `:help vim.highlight.on_yank()`
@@ -722,7 +649,7 @@ local on_attach = function(_, bufnr)
   map('n', 'gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
   map('n', 'gi', require('telescope.builtin').lsp_implementations, '[G]oto [I]mplementation')
   map('n', 'gy', require('telescope.builtin').lsp_type_definitions, '[G]oto T[y]pe Definition')
-  map('n', '<leader>ds', require('telescope.builtin').lsp_document_symbols, '[D]ocument [S]ymbols') -- TODO: potentially remap this
+  map('n', '<leader>ds', require('telescope.builtin').lsp_document_symbols, '[D]ocument [S]ymbols')           -- TODO: potentially remap this
   map('n', '<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols') -- TODO: potentially remap this
 
   -- See `:help K` for why this keymap
@@ -765,6 +692,7 @@ local on_attach = function(_, bufnr)
       },
     })
   end
+
   -- Show diagnostics under the cursor when holding position
   vim.api.nvim_create_augroup("lsp_diagnostics_hold", { clear = true })
   vim.api.nvim_create_autocmd({ "CursorHold" }, {
@@ -786,9 +714,9 @@ local servers = {
   tsserver = {},
 }
 
-local handlers =  {
-  ["textDocument/hover"] =  vim.lsp.with(vim.lsp.handlers.hover, { max_width = 100 }),
-  ["textDocument/signatureHelp"] =  vim.lsp.with(vim.lsp.handlers.signature_help, { max_width = 100 }),
+local handlers = {
+  ["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { max_width = 100 }),
+  ["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, { max_width = 100 }),
 }
 
 -- Disable annoying inline virtual_text lint/lsp errors
@@ -872,10 +800,10 @@ cmp.setup {
 
 vim.o.equalalways = false
 
-vim.keymap.set('t', '<C-w>h', "<C-\\><C-n><C-w>h",{silent = true})
-vim.keymap.set('t', '<C-w>j', "<C-\\><C-n><C-w>j",{silent = true})
-vim.keymap.set('t', '<C-w>k', "<C-\\><C-n><C-w>k",{silent = true})
-vim.keymap.set('t', '<C-w>l', "<C-\\><C-n><C-w>l",{silent = true})
+vim.keymap.set('t', '<C-w>h', "<C-\\><C-n><C-w>h", { silent = true })
+vim.keymap.set('t', '<C-w>j', "<C-\\><C-n><C-w>j", { silent = true })
+vim.keymap.set('t', '<C-w>k', "<C-\\><C-n><C-w>k", { silent = true })
+vim.keymap.set('t', '<C-w>l', "<C-\\><C-n><C-w>l", { silent = true })
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
