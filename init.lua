@@ -234,39 +234,39 @@ require('lazy').setup({
     opts = {
     },
     config = function()
-      -- local HEIGHT_RATIO = 0.8
-      -- local WIDTH_RATIO = 0.5
+      local HEIGHT_RATIO = 0.8
+      local WIDTH_RATIO = 0.5
 
       require('nvim-tree').setup {
         on_attach = "default",
         view = {
           relativenumber = true,
           centralize_selection = true,
-          -- float = {
-          --   enable = true,
-          --   open_win_config = function()
-          --     local screen_w = vim.opt.columns:get()
-          --     local screen_h = vim.opt.lines:get() - vim.opt.cmdheight:get()
-          --     local window_w = screen_w * WIDTH_RATIO
-          --     local window_h = screen_h * HEIGHT_RATIO
-          --     local window_w_int = math.floor(window_w)
-          --     local window_h_int = math.floor(window_h)
-          --     local center_x = (screen_w - window_w) / 2
-          --     local center_y = ((vim.opt.lines:get() - window_h) / 2)
-          --         - vim.opt.cmdheight:get()
-          --     return {
-          --       border = "rounded",
-          --       relative = "editor",
-          --       row = center_y,
-          --       col = center_x,
-          --       width = window_w_int,
-          --       height = window_h_int,
-          --     }
-          --   end,
-          -- },
-          -- width = function()
-          --   return math.floor(vim.opt.columns:get() * WIDTH_RATIO)
-          -- end,
+          float = {
+            enable = true,
+            open_win_config = function()
+              local screen_w = vim.opt.columns:get()
+              local screen_h = vim.opt.lines:get() - vim.opt.cmdheight:get()
+              local window_w = screen_w * WIDTH_RATIO
+              local window_h = screen_h * HEIGHT_RATIO
+              local window_w_int = math.floor(window_w)
+              local window_h_int = math.floor(window_h)
+              local center_x = (screen_w - window_w) / 2
+              local center_y = ((vim.opt.lines:get() - window_h) / 2)
+                  - vim.opt.cmdheight:get()
+              return {
+                border = "rounded",
+                relative = "editor",
+                row = center_y,
+                col = center_x,
+                width = window_w_int,
+                height = window_h_int,
+              }
+            end,
+          },
+          width = function()
+            return math.floor(vim.opt.columns:get() * WIDTH_RATIO)
+          end,
         },
         renderer = {
           add_trailing = true,
@@ -300,8 +300,9 @@ require('lazy').setup({
         }
       }
 
+      local nvimtreeApi = require('nvim-tree.api')
       local function toggle()
-        require('nvim-tree.api').tree.toggle({
+        nvimtreeApi.tree.toggle({
           find_file = true,
           focus = true,
           path = '<arg>',
@@ -309,7 +310,15 @@ require('lazy').setup({
         })
       end
 
+      local nvimtreeView = require('nvim-tree.view')
+      local function closeIfNvimtreeFocused()
+        if nvimtreeView.is_visible then
+          nvimtreeApi.tree.close()
+        end
+      end
+
       vim.keymap.set('n', '<leader>t', toggle, { desc = 'File [T]ree' })
+      vim.keymap.set('n', '<esc>', closeIfNvimtreeFocused)
     end,
   },
 
@@ -332,6 +341,32 @@ require('lazy').setup({
   {
     'stevearc/dressing.nvim',
     opts = {},
+    lazy = false,
+    event = "VeryLazy",
+    config = function()
+      -- Fix for nvim-tree - we don't want dressing to close nvim-tree
+      local status_ok, dressing = pcall(require, "dressing")
+      if not status_ok then
+        print("dressing not found!")
+      end
+      dressing.setup({
+        input = {
+          get_config = function()
+            if vim.api.nvim_buf_get_option(0, "filetype") == "NvimTree" then
+              return { enabled = false }
+            end
+          end,
+        },
+        select = {
+          backend = { "telescope", "builtin" },
+          get_config = function()
+            if vim.api.nvim_buf_get_option(0, "filetype") == "NvimTree" then
+              return { enabled = false }
+            end
+          end,
+        },
+      })
+    end,
   },
 
   -- Fuzzy Finder Algorithm which requires local dependencies to be built.
