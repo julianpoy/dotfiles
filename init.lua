@@ -244,6 +244,7 @@ require('lazy').setup({
           centralize_selection = true,
           float = {
             enable = true,
+            quit_on_focus_loss = false,
             open_win_config = function()
               local screen_w = vim.opt.columns:get()
               local screen_h = vim.opt.lines:get() - vim.opt.cmdheight:get()
@@ -344,29 +345,21 @@ require('lazy').setup({
     lazy = false,
     event = "VeryLazy",
     config = function()
-      -- Fix for nvim-tree - we don't want dressing to close nvim-tree
-      local status_ok, dressing = pcall(require, "dressing")
-      if not status_ok then
-        print("dressing not found!")
-      end
-      dressing.setup({
+      require("dressing").setup({
         input = {
-          get_config = function()
-            if vim.api.nvim_buf_get_option(0, "filetype") == "NvimTree" then
-              return { enabled = false }
+          insert_only = false,
+          relative = "cursor",
+          get_config = function(opts)
+            if opts.kind == "codeaction" then
+              local telescopeCursor = require("telescope.themes").get_cursor()
+              return {
+                telescope = telescopeCursor,
+              }
             end
-          end,
-        },
-        select = {
-          backend = { "telescope", "builtin" },
-          get_config = function()
-            if vim.api.nvim_buf_get_option(0, "filetype") == "NvimTree" then
-              return { enabled = false }
-            end
-          end,
-        },
+          end
+        }
       })
-    end,
+    end
   },
 
   -- Fuzzy Finder Algorithm which requires local dependencies to be built.
@@ -589,22 +582,6 @@ require('telescope').setup {
       show_line = false
     },
   }
-}
-local telescopeCursor = require("telescope.themes").get_cursor()
-require('dressing').setup {
-  input = {
-    insert_only = false,
-    relative = "cursor",
-  },
-  select = {
-    get_config = function(opts)
-      if opts.kind == "codeaction" then
-        return {
-          telescope = telescopeCursor,
-        }
-      end
-    end,
-  },
 }
 
 -- Enable telescope fzf native, if installed
