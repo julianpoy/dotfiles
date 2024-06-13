@@ -239,6 +239,11 @@ require('lazy').setup({
 
       require('nvim-tree').setup {
         on_attach = "default",
+        actions = {
+          open_file = {
+            quit_on_open = true,
+          },
+        },
         view = {
           relativenumber = true,
           centralize_selection = true,
