@@ -234,7 +234,7 @@ require('lazy').setup({
     opts = {
     },
     config = function()
-      local HEIGHT_RATIO = 0.8
+      local HEIGHT_RATIO = 0.9
       local WIDTH_RATIO = 0.5
 
       require('nvim-tree').setup {
