@@ -14,7 +14,7 @@ fish -c "fish /tmp/fish-aliases.sh"
 # NVM
 fish -c "fisher install jorgebucaran/nvm.fish"
 fish -c "set --universal nvm_default_version 20"
-fish -c "set --universal nvm_default_packages yarn nx neovim typescript"
+fish -c "set --universal nvm_default_packages yarn nx neovim typescript tree-sitter-cli"
 fish -c "nvm install 20"
 fish -c "alias vim='~/.neovim-bin/squashfs-root/usr/bin/nvim' && funcsave vim"
 
