@@ -729,7 +729,36 @@ local servers = {
   -- gopls = {},
   -- pyright = {},
   -- rust_analyzer = {},
-  tsserver = {},
+  -- tsserver = {},
+  vtsls = {
+    vtsls = {
+      autoUseWorkspaceTsdk = true,
+      experimental = {
+        completion = {
+          enableServerSideFuzzyMatch = true,
+          entriesLimit = 8,
+        },
+      },
+    },
+    typescript = {
+      preferGoToSourceDefinition = true,
+      tsserver = {
+        maxTsServerMemory = 8192,
+      },
+      preferences = {
+        importModuleSpecifier = "project-relative",
+        preferTypeOnlyAutoImports = true,
+        renameMatchingJsxTags = true,
+      },
+    },
+    javascript = {
+      preferGoToSourceDefinition = true,
+      preferences = {
+        importModuleSpecifier = "project-relative",
+        renameMatchingJsxTags = true,
+      },
+    },
+  },
 }
 
 local handlers = {
