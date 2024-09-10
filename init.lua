@@ -66,22 +66,224 @@ require('lazy').setup({
       -- Automatically install LSPs to stdpath for neovim
       { 'williamboman/mason.nvim', config = true },
       'williamboman/mason-lspconfig.nvim',
+      'WhoIsSethDaniel/mason-tool-installer.nvim',
 
       -- Useful status updates for LSP
-      {
-        'j-hui/fidget.nvim',
-        opts = {}
-      },
+      { 'j-hui/fidget.nvim', opts = {} },
+
+      'hrsh7th/cmp-nvim-lsp',
     },
+    config = function()
+      vim.api.nvim_create_autocmd('LspAttach', {
+        group = vim.api.nvim_create_augroup('kickstart-lsp-attach', { clear = true }),
+        callback = function(event)
+          local map = function(keys, func, desc, mode)
+            mode = mode or 'n'
+            vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = 'LSP: ' .. desc })
+          end
+
+          map('gd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
+          map('gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
+          map('gi', require('telescope.builtin').lsp_implementations, '[G]oto [I]mplementation')
+          map('<leader>h', vim.lsp.buf.hover, '[H]over Documentation')
+          map('<leader>gy', require('telescope.builtin').lsp_type_definitions, '[G]oto T[y]pe Definition')
+          map('<leader>ds', require('telescope.builtin').lsp_document_symbols, '[D]ocument [S]ymbols')
+          map('<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols')
+          map('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
+          map('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction', { 'n', 'x' })
+          map('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
+
+          -- Show diagnostics under the cursor when holding position
+          local lsp_diagnostics_hold_augroup = vim.api.nvim_create_augroup("lsp_diagnostics_hold", { clear = true })
+          vim.api.nvim_create_autocmd({ "CursorHold" }, {
+            buffer = event.buf,
+            group = lsp_diagnostics_hold_augroup,
+            callback = function()
+              for _, winid in pairs(vim.api.nvim_tabpage_list_wins(0)) do
+                if vim.api.nvim_win_get_config(winid).zindex then
+                  return
+                end
+              end
+              vim.diagnostic.open_float({
+                scope = "cursor",
+                focusable = false,
+                close_events = {
+                  "CursorMoved",
+                  "CursorMovedI",
+                  "BufHidden",
+                  "InsertCharPre",
+                  "WinLeave",
+                },
+              })
+            end
+          })
+          vim.api.nvim_create_autocmd('LspDetach', {
+            group = vim.api.nvim_create_augroup('lsp_diagnostics_hold_detach', { clear = true }),
+            callback = function(event2)
+              vim.lsp.buf.clear_references()
+              vim.api.nvim_clear_autocmds { group = 'lsp_diagnostics_hold', buffer = event2.buf }
+            end,
+          })
+
+          -- The following two autocommands are used to highlight references of the
+          -- word under your cursor when your cursor rests there for a little while.
+          --    See `:help CursorHold` for information about when this is executed
+          --
+          -- When you move your cursor, the highlights will be cleared (the second autocommand).
+          local client = vim.lsp.get_client_by_id(event.data.client_id)
+          if client and client.supports_method(vim.lsp.protocol.Methods.textDocument_documentHighlight) then
+            local highlight_augroup = vim.api.nvim_create_augroup('kickstart-lsp-highlight', { clear = false })
+            vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
+              buffer = event.buf,
+              group = highlight_augroup,
+              callback = vim.lsp.buf.document_highlight,
+            })
+
+            vim.api.nvim_create_autocmd({ 'CursorMoved', 'CursorMovedI' }, {
+              buffer = event.buf,
+              group = highlight_augroup,
+              callback = vim.lsp.buf.clear_references,
+            })
+
+            vim.api.nvim_create_autocmd('LspDetach', {
+              group = vim.api.nvim_create_augroup('kickstart-lsp-detach', { clear = true }),
+              callback = function(event2)
+                vim.lsp.buf.clear_references()
+                vim.api.nvim_clear_autocmds { group = 'kickstart-lsp-highlight', buffer = event2.buf }
+              end,
+            })
+          end
+
+          -- The following code creates a keymap to toggle inlay hints in your
+          -- code, if the language server you are using supports them
+          --
+          -- This may be unwanted, since they displace some of your code
+          if client and client.supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
+            map('<leader>th', function()
+              vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf })
+            end, '[T]oggle Inlay [H]ints')
+          end
+        end,
+      })
+
+      -- LSP servers and clients are able to communicate to each other what features they support.
+      --  By default, Neovim doesn't support everything that is in the LSP specification.
+      --  When you add nvim-cmp, luasnip, etc. Neovim now has *more* capabilities.
+      --  So, we create new capabilities with nvim cmp, and then broadcast that to the servers.
+      local capabilities = vim.lsp.protocol.make_client_capabilities()
+      capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
+
+      -- Enable the following language servers
+      --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
+      --
+      --  Add any additional override configuration in the following tables. Available keys are:
+      --  - cmd (table): Override the default command used to start the server
+      --  - filetypes (table): Override the default list of associated filetypes for the server
+      --  - capabilities (table): Override fields in capabilities. Can be used to disable certain LSP features.
+      --  - settings (table): Override the default settings passed when initializing the server.
+      --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
+      local servers = {
+        vtsls = {
+          vtsls = {
+            autoUseWorkspaceTsdk = true,
+            experimental = {
+              completion = {
+                enableServerSideFuzzyMatch = true,
+                entriesLimit = 15,
+              },
+            },
+          },
+          typescript = {
+            preferGoToSourceDefinition = true,
+            tsserver = {
+              maxTsServerMemory = 8192,
+            },
+            preferences = {
+              importModuleSpecifier = "project-relative",
+              preferTypeOnlyAutoImports = true,
+              renameMatchingJsxTags = true,
+            },
+          },
+          javascript = {
+            preferGoToSourceDefinition = true,
+            preferences = {
+              importModuleSpecifier = "project-relative",
+              renameMatchingJsxTags = true,
+            },
+          },
+        },
+      }
+
+      -- Ensure the servers and tools above are installed
+      --  To check the current status of installed tools and/or manually install
+      --  other tools, you can run
+      --    :Mason
+      --
+      --  You can press `g?` for help in this menu.
+      require('mason').setup()
+
+      -- You can add other tools here that you want Mason to install
+      -- for you, so that they are available from within Neovim.
+      local ensure_installed = vim.tbl_keys(servers or {})
+      vim.list_extend(ensure_installed, {
+        'stylua', -- Used to format Lua code
+      })
+      require('mason-tool-installer').setup { ensure_installed = ensure_installed }
+
+      require('mason-lspconfig').setup {
+        handlers = {
+          function(server_name)
+            local server = servers[server_name] or {}
+            -- This handles overriding only values explicitly passed
+            -- by the server configuration above. Useful when disabling
+            -- certain features of an LSP (for example, turning off formatting for tsserver)
+            server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
+            require('lspconfig')[server_name].setup(server)
+          end,
+        },
+      }
+    end,
   },
 
   { -- Autocompletion
     'hrsh7th/nvim-cmp',
+    event = 'InsertEnter',
     dependencies = {
       'hrsh7th/cmp-path',
       'hrsh7th/cmp-nvim-lsp',
     },
+    config = function()
+      local cmp = require 'cmp'
+
+      cmp.setup {
+        performance = {
+          max_view_entries = 10,
+        },
+        completion = { completeopt = 'menu,menuone,noselect' },
+        formatting = {
+          format = function(entry, vim_item)
+            vim_item.abbr = string.sub(vim_item.abbr, 1, 20)
+            return vim_item
+          end
+        },
+
+        mapping = cmp.mapping.preset.insert {
+          ['<CR>'] = cmp.mapping.confirm {
+            behavior = cmp.ConfirmBehavior.Replace,
+            select = false,
+          },
+          ['<Tab>'] = cmp.mapping.select_next_item(),
+          ['<S-Tab>'] = cmp.mapping.select_prev_item(),
+        },
+        sources = {
+          { name = 'nvim_lsp' },
+          { name = 'path' },
+        },
+      }
+    end,
   },
+
+  { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
 
   { -- Autoformat
     'stevearc/conform.nvim',
@@ -183,7 +385,7 @@ require('lazy').setup({
   -- Add indentation guides even on blank lines
   {
     'lukas-reineke/indent-blankline.nvim',
-    tag = "v3.6.2",
+    tag = "v3.7.2",
     config = function()
       require("ibl").setup {
         indent = {
@@ -199,6 +401,20 @@ require('lazy').setup({
     end
   },
 
+  {
+    'windwp/nvim-autopairs',
+    event = 'InsertEnter',
+    -- Optional dependency
+    dependencies = { 'hrsh7th/nvim-cmp' },
+    config = function()
+      require('nvim-autopairs').setup {}
+      -- If you want to automatically add `(` after selecting a function or method
+      local cmp_autopairs = require 'nvim-autopairs.completion.cmp'
+      local cmp = require 'cmp'
+      cmp.event:on('confirm_done', cmp_autopairs.on_confirm_done())
+    end,
+  },
+
   -- { -- Easy editing movements for quotes, parenthesis, etc
   --   'tpope/vim-surround'
   -- },
@@ -206,7 +422,6 @@ require('lazy').setup({
   -- Multiple cursors with <C-n>
   {
     'mg979/vim-visual-multi',
-    tag = "v0.5.8",
   },
 
   -- Powerful search
@@ -380,88 +595,36 @@ require('lazy').setup({
     end,
   },
 
-  -- Highligh code
+  -- Highlight code
   {
     'nvim-treesitter/nvim-treesitter',
     build = ":TSUpdate",
-  },
+    main = 'nvim-treesitter.configs',
+    opts = {
+      ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'tsx', 'typescript', 'vimdoc', 'vim' },
 
-  -- Built-in debugger
-  {
-    'mfussenegger/nvim-dap',
-    dependencies = {
-      -- Creates a beautiful debugger UI
-      'rcarriga/nvim-dap-ui',
+      auto_install = true,
 
-      -- Required by nvim-dap-ui
-      'nvim-neotest/nvim-nio',
-
-      -- Installs the debug adapters for you
-      'williamboman/mason.nvim',
-      'jay-babu/mason-nvim-dap.nvim',
-
-      -- Add your own debuggers here
-      'leoluz/nvim-dap-go',
+      highlight = {
+        enable = true,
+        disable = function(lang, buf)
+          local max_filesize = 100 * 1024 -- 100 KB
+          local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
+          if ok and stats and stats.size > max_filesize then
+            return true
+          end
+        end,
+        additional_vim_regex_highlighting = false,
+      },
+      indent = {
+        enable = false,
+        disable = { 'python', 'typescript', 'javascript', 'tsx' }
+      },
+      incremental_selection = {
+        enable = false, -- Perhaps play with in the future, but not useful for now
+      },
     },
-    config = function()
-      local dap = require 'dap'
-      local dapui = require 'dapui'
-
-      require('mason-nvim-dap').setup {
-        -- Makes a best effort to setup the various debuggers with
-        -- reasonable debug configurations
-        automatic_setup = true,
-
-        -- You can provide additional configuration to the handlers,
-        -- see mason-nvim-dap README for more information
-        handlers = {},
-
-        ensure_installed = {
-          -- Update this to ensure that you have the debuggers for the langs you want
-          'node2',
-        },
-      }
-
-      -- Basic debugging keymaps, feel free to change to your liking!
-      vim.keymap.set('n', '<F5>', dap.continue)
-      vim.keymap.set('n', '<F1>', dap.step_into)
-      vim.keymap.set('n', '<F2>', dap.step_over)
-      vim.keymap.set('n', '<F3>', dap.step_out)
-      vim.keymap.set('n', '<leader>b', dap.toggle_breakpoint, { desc = "Toggle [b]reakpoint" })
-      vim.keymap.set('n', '<leader>B', function()
-        dap.set_breakpoint(vim.fn.input 'Breakpoint condition: ')
-      end, { desc = "Set [b]reakpoint with condition" })
-
-      -- Dap UI setup
-      -- For more information, see |:help nvim-dap-ui|
-      dapui.setup {
-        -- Set icons to characters that are more likely to work in every terminal.
-        icons = { expanded = '▾', collapsed = '▸', current_frame = '*' },
-        controls = {
-          icons = {
-            pause = '⏸',
-            play = '▶',
-            step_into = '⏎',
-            step_over = '⏭',
-            step_out = '⏮',
-            step_back = 'b',
-            run_last = '▶▶',
-            terminate = '⏹',
-            disconnect = "⏏",
-          },
-        },
-      }
-      -- toggle to see last session result. Without this, you can't see session output in case of unhandled exception.
-      vim.keymap.set("n", "<F7>", dapui.toggle)
-
-      dap.listeners.after.event_initialized['dapui_config'] = dapui.open
-      dap.listeners.before.event_terminated['dapui_config'] = dapui.close
-      dap.listeners.before.event_exited['dapui_config'] = dapui.close
-
-      -- Install golang specific config
-      require('dap-go').setup()
-    end,
-  }
+  },
 }, {
   checker = {
     -- automatically check for plugin updates
@@ -614,245 +777,17 @@ vim.keymap.set('n', '<leader>sc', require('telescope.builtin').commands, { desc 
 vim.keymap.set('n', '<leader>sk', require('telescope.builtin').keymaps, { desc = '[S]earch [K]eymaps' })
 vim.keymap.set('n', '<leader>sr', require('telescope.builtin').resume, { desc = '[S]earch [R]esume (previous search)' })
 
--- [[ Configure Treesitter ]]
--- See `:help nvim-treesitter`
-require('nvim-treesitter.configs').setup {
-  -- Add languages to be installed here that you want installed for treesitter
-  ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'tsx', 'typescript', 'vimdoc', 'vim' },
-
-  auto_install = true,
-
-  highlight = {
-    enable = true,
-    disable = function(lang, buf)
-      local max_filesize = 100 * 1024 -- 100 KB
-      local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
-      if ok and stats and stats.size > max_filesize then
-        return true
-      end
-    end,
-    additional_vim_regex_highlighting = false,
-  },
-  indent = {
-    enable = false, -- Disabled for now, had trouble with it just being wrong all the time in TypeScript
-    -- disable = { 'python' }
-  },
-  incremental_selection = {
-    enable = false, -- Perhaps play with in the future, but not useful for now
-    keymaps = {
-      init_selection = '<c-space>',
-      node_incremental = '<c-space>',
-      scope_incremental = '<c-s>',
-      node_decremental = '<M-space>',
-    },
-  },
-}
-
--- [[ Fold based on TreeSitter ]]
-vim.opt.foldmethod = 'expr'
-vim.opt.foldexpr = 'nvim_treesitter#foldexpr()'
-vim.opt.foldlevel = 99
-
 -- Diagnostic keymaps
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = "Go to previous [d]iagnostic message" })
 vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = "Go to next [d]iagnostic message" })
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = "Show floating diagnostic [e]rror message" })
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = "Open diagnostics list" })
 
--- LSP settings.
-local on_attach = function(_, bufnr)
-  local map = function(modes, keys, func, desc)
-    if desc then
-      desc = 'LSP: ' .. desc
-    end
-
-    vim.keymap.set(modes, keys, func, { buffer = bufnr, desc = desc })
-  end
-
-  map('n', '<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
-  map('n', '<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
-
-  map('n', 'gd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
-  map('n', 'gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
-  map('n', 'gi', require('telescope.builtin').lsp_implementations, '[G]oto [I]mplementation')
-  map('n', 'gy', require('telescope.builtin').lsp_type_definitions, '[G]oto T[y]pe Definition')
-  map('n', '<leader>ds', require('telescope.builtin').lsp_document_symbols, '[D]ocument [S]ymbols')           -- TODO: potentially remap this
-  map('n', '<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols') -- TODO: potentially remap this
-
-  -- See `:help K` for why this keymap
-  map('n', '<leader>h', vim.lsp.buf.hover, 'Hover Documentation')
-  map({ 'n', 'i' }, '<C-h>', vim.lsp.buf.signature_help, 'Signature Documentation') -- TODO: potentially remap this
-
-  -- TODO: potentially remove this
-  -- Lesser used LSP functionality
-  map('n', 'gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
-  map('n', '<leader>wa', vim.lsp.buf.add_workspace_folder, '[W]orkspace [A]dd Folder')
-  map('n', '<leader>wr', vim.lsp.buf.remove_workspace_folder, '[W]orkspace [R]emove Folder')
-  map('n', '<leader>wl', function()
-    print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-  end, '[W]orkspace [L]ist Folders')
-
-  -- Create a command `:Format` local to the LSP buffer
-  vim.api.nvim_buf_create_user_command(bufnr, 'Format', function(_)
-    vim.lsp.buf.format()
-  end, { desc = 'Format current buffer with LSP' })
-
-
-  -- Function to check if a floating dialog exists and if not
-  -- then check for diagnostics under the cursor
-  function OpenDiagnosticIfNoFloat()
-    for _, winid in pairs(vim.api.nvim_tabpage_list_wins(0)) do
-      if vim.api.nvim_win_get_config(winid).zindex then
-        return
-      end
-    end
-    -- THIS IS FOR BUILTIN LSP
-    vim.diagnostic.open_float({
-      scope = "cursor",
-      focusable = false,
-      close_events = {
-        "CursorMoved",
-        "CursorMovedI",
-        "BufHidden",
-        "InsertCharPre",
-        "WinLeave",
-      },
-    })
-  end
-
-  -- Show diagnostics under the cursor when holding position
-  vim.api.nvim_create_augroup("lsp_diagnostics_hold", { clear = true })
-  vim.api.nvim_create_autocmd({ "CursorHold" }, {
-    pattern = "*",
-    command = "lua OpenDiagnosticIfNoFloat()",
-    group = "lsp_diagnostics_hold",
-  })
-end
-
--- Enable the following language servers
---  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
---  Add any additional override configuration in the following tables. They will be passed to
---  the `settings` field of the server config.
-local servers = {
-  -- clangd = {},
-  -- gopls = {},
-  -- pyright = {},
-  -- rust_analyzer = {},
-  -- tsserver = {},
-  vtsls = {
-    vtsls = {
-      autoUseWorkspaceTsdk = true,
-      experimental = {
-        completion = {
-          enableServerSideFuzzyMatch = true,
-          entriesLimit = 15,
-        },
-      },
-    },
-    typescript = {
-      preferGoToSourceDefinition = true,
-      tsserver = {
-        maxTsServerMemory = 8192,
-      },
-      preferences = {
-        importModuleSpecifier = "project-relative",
-        preferTypeOnlyAutoImports = true,
-        renameMatchingJsxTags = true,
-      },
-    },
-    javascript = {
-      preferGoToSourceDefinition = true,
-      preferences = {
-        importModuleSpecifier = "project-relative",
-        renameMatchingJsxTags = true,
-      },
-    },
-  },
-}
-
-local handlers = {
-  ["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { max_width = 100 }),
-  ["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, { max_width = 100 }),
-}
-
 -- Disable annoying inline virtual_text lint/lsp errors
 vim.diagnostic.config({
   virtual_text = false,
   underline = true
 })
-
--- nvim-cmp supports additional completion capabilities, so broadcast that to servers
-local capabilities = vim.lsp.protocol.make_client_capabilities()
-capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
-
--- Ensure the servers above are installed
-local mason_lspconfig = require 'mason-lspconfig'
-
-mason_lspconfig.setup {
-  ensure_installed = vim.tbl_keys(servers),
-}
-
-mason_lspconfig.setup_handlers {
-  function(server_name)
-    require('lspconfig')[server_name].setup {
-      capabilities = capabilities,
-      on_attach = on_attach,
-      settings = servers[server_name],
-      handlers = handlers
-    }
-  end,
-}
-
--- nvim-cmp setup
-local cmp = require 'cmp'
-
-cmp.setup {
-  performance = {
-    max_view_entries = 10,
-  },
-  preselect = cmp.PreselectMode.None,
-  -- window = {
-  --   completion = cmp.config.window.bordered(),
-  --   documentation = cmp.config.window.bordered(),
-  -- },
-  formatting = {
-    format = function(entry, vim_item)
-      vim_item.abbr = string.sub(vim_item.abbr, 1, 20)
-      return vim_item
-    end
-  },
-  mapping = cmp.mapping.preset.insert {
-    ['<C-n>'] = cmp.mapping.select_next_item(),
-    ['<C-p>'] = cmp.mapping.select_prev_item(),
-    ['<C-d>'] = cmp.mapping.scroll_docs(-4),
-    ['<C-f>'] = cmp.mapping.scroll_docs(4),
-    ['<C-Space>'] = cmp.mapping.complete {},
-    ['<CR>'] = cmp.mapping.confirm {
-      behavior = cmp.ConfirmBehavior.Replace,
-      select = false,
-    },
-    ['<Tab>'] = cmp.mapping(function(fallback)
-      if cmp.visible() then
-        cmp.select_next_item()
-      else
-        fallback()
-      end
-    end, { 'i', 's' }),
-    ['<S-Tab>'] = cmp.mapping(function(fallback)
-      if cmp.visible() then
-        cmp.select_prev_item()
-      else
-        fallback()
-      end
-    end, { 'i', 's' }),
-  },
-  sources = cmp.config.sources({
-    { name = 'nvim_lsp' },
-  }, {
-    -- { name = 'buffer' },
-    { name = 'path' }
-  })
-}
 
 vim.o.equalalways = false
 
