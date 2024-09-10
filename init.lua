@@ -415,6 +415,8 @@ require('lazy').setup({
       cmp.event:on('confirm_done', cmp_autopairs.on_confirm_done())
 
       local npairs = require'nvim-autopairs'
+      local Rule = require'nvim-autopairs.rule'
+      local cond = require 'nvim-autopairs.conds'
       npairs.add_rule(Rule('<', '>', {
         -- if you use nvim-ts-autotag, you may want to exclude these filetypes from this rule
         -- so that it doesn't conflict with nvim-ts-autotag
