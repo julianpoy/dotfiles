@@ -199,6 +199,7 @@ require('lazy').setup({
               maxTsServerMemory = 8192,
             },
             preferences = {
+              includePackageJsonAutoImports = "off",
               importModuleSpecifier = "project-relative",
               preferTypeOnlyAutoImports = true,
               renameMatchingJsxTags = true,
