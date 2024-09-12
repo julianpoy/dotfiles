@@ -7,6 +7,11 @@ alias gp "git pull origin HEAD"
 funcsave gp
 alias gf "git fetch --all"
 funcsave gf
+function fxap --wraps='coder port-forward fxa2 --tcp 3030,3031,3035,9299,9090,37255,9000,1111,8290' --description 'alias fxap coder port-forward fxa --tcp 3030,3031,9299,9090,37255,9000,1111,8290'
+  coder port-forward fxa2 --tcp 3030,3031,3035,9299,9090,37255,9000,1111,8290 $argv
+        
+end
+funcsave fxap
 function setupstream
 git branch --set-upstream-to=origin/(git rev-parse --abbrev-ref HEAD) (git rev-parse --abbrev-ref HEAD)
 end
