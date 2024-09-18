@@ -293,19 +293,19 @@ require('lazy').setup({
   },
 
   -- Adds git releated signs to the gutter, as well as utilities for managing changes
-  {
-    'lewis6991/gitsigns.nvim',
-    opts = {
-      -- See `:help gitsigns.txt`
-      signs = {
-        add = { text = '+' },
-        change = { text = '~' },
-        delete = { text = '_' },
-        topdelete = { text = '‾' },
-        changedelete = { text = '~' },
-      },
-    },
-  },
+  -- {
+  --   'lewis6991/gitsigns.nvim',
+  --   opts = {
+  --     -- See `:help gitsigns.txt`
+  --     signs = {
+  --       add = { text = '+' },
+  --       change = { text = '~' },
+  --       delete = { text = '_' },
+  --       topdelete = { text = '‾' },
+  --       changedelete = { text = '~' },
+  --     },
+  --   },
+  -- },
 
   -- Syntax theme
   {
@@ -352,23 +352,23 @@ require('lazy').setup({
   },
 
   -- Add indentation guides even on blank lines
-  {
-    'lukas-reineke/indent-blankline.nvim',
-    tag = "v3.7.2",
-    config = function()
-      require("ibl").setup {
-        indent = {
-          char = "┊"
-        },
-        whitespace = {
-          remove_blankline_trail = true,
-        },
-        scope = {
-          enabled = false,
-        },
-      }
-    end
-  },
+  -- {
+  --   'lukas-reineke/indent-blankline.nvim',
+  --   tag = "v3.7.2",
+  --   config = function()
+  --     require("ibl").setup {
+  --       indent = {
+  --         char = "┊"
+  --       },
+  --       whitespace = {
+  --         remove_blankline_trail = true,
+  --       },
+  --       scope = {
+  --         enabled = false,
+  --       },
+  --     }
+  --   end
+  -- },
 
   {
     'windwp/nvim-autopairs',
@@ -404,9 +404,9 @@ require('lazy').setup({
   },
 
   -- Multiple cursors with <C-n>
-  {
-    'mg979/vim-visual-multi',
-  },
+  -- {
+  --   'mg979/vim-visual-multi',
+  -- },
 
   -- Powerful search
   {
