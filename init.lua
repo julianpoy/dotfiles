@@ -563,12 +563,6 @@ require('lazy').setup({
     end,
   },
 
-  -- Native feeling comment operations - use "gc" to comment visual regions/lines
-  {
-    'numToStr/Comment.nvim',
-    opts = {}
-  },
-
   -- Fuzzy Finder (files, lsp, etc)
   {
     'nvim-telescope/telescope.nvim',
