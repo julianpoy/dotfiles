@@ -351,20 +351,6 @@ require('lazy').setup({
     priority = 1000
   },
 
-  -- Pretty statusline that shows mode and file info
-  {
-    'nvim-lualine/lualine.nvim',
-    -- See `:help lualine.txt`
-    opts = {
-      options = {
-        icons_enabled = false,
-        theme = 'gruvbox_dark',
-        component_separators = '|',
-        section_separators = '',
-      },
-    },
-  },
-
   -- Add indentation guides even on blank lines
   {
     'lukas-reineke/indent-blankline.nvim',
@@ -416,10 +402,6 @@ require('lazy').setup({
       end))
     end,
   },
-
-  -- { -- Easy editing movements for quotes, parenthesis, etc
-  --   'tpope/vim-surround'
-  -- },
 
   -- Multiple cursors with <C-n>
   {
