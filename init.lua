@@ -95,6 +95,27 @@ require('lazy').setup({
         end,
       })
 
+      vim.api.nvim_create_autocmd({ "CursorHold" }, {
+        group = vim.api.nvim_create_augroup('jp-lsp-cursorhold', { clear = true }),
+        callback = function()
+          for _, winid in pairs(vim.api.nvim_tabpage_list_wins(0)) do
+            if vim.api.nvim_win_get_config(winid).zindex then
+              return
+            end
+          end
+          vim.diagnostic.open_float({
+            focusable = false,
+            close_events = {
+              "CursorMoved",
+              "CursorMovedI",
+              "BufHidden",
+              "InsertCharPre",
+              "WinLeave",
+            },
+          })
+        end
+      })
+
       -- LSP servers and clients are able to communicate to each other what features they support.
       --  By default, Neovim doesn't support everything that is in the LSP specification.
       --  When you add nvim-cmp, luasnip, etc. Neovim now has *more* capabilities.
@@ -572,7 +593,7 @@ vim.o.smartcase = true
 vim.wo.signcolumn = 'yes'
 
 -- Decrease update time
-vim.o.updatetime = 250
+vim.o.updatetime = 300
 vim.o.timeout = true
 vim.o.timeoutlen = 300
 
