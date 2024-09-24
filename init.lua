@@ -185,7 +185,6 @@ require('lazy').setup({
       local servers = {
         vtsls = {
           vtsls = {
-            autoUseWorkspaceTsdk = true,
             experimental = {
               completion = {
                 enableServerSideFuzzyMatch = true,
@@ -196,10 +195,9 @@ require('lazy').setup({
           typescript = {
             preferGoToSourceDefinition = true,
             tsserver = {
-              maxTsServerMemory = 8192,
+              maxTsServerMemory = 10240,
             },
             preferences = {
-              includePackageJsonAutoImports = "off",
               importModuleSpecifier = "project-relative",
               preferTypeOnlyAutoImports = true,
               renameMatchingJsxTags = true,
