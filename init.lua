@@ -195,6 +195,7 @@ require('lazy').setup({
           typescript = {
             preferGoToSourceDefinition = true,
             tsserver = {
+              nodePath = "node",
               maxTsServerMemory = 10240,
             },
             preferences = {
