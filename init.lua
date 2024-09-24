@@ -210,6 +210,13 @@ require('lazy').setup({
           max_view_entries = 10,
         },
         completion = { completeopt = 'menu,menuone,noselect' },
+        matching = {
+          disallow_fuzzy_matching = true,
+          disallow_fullfuzzy_matching = true,
+          disallow_partial_fuzzy_matching = true,
+          disallow_partial_matching = true,
+          disallow_prefix_unmatching = false,
+        },
         formatting = {
           format = function(entry, vim_item)
             vim_item.abbr = string.sub(vim_item.abbr, 1, 20)
