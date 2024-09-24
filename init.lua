@@ -92,77 +92,6 @@ require('lazy').setup({
           map('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
           map('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction', { 'n', 'x' })
           map('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
-
-          -- Show diagnostics under the cursor when holding position
-          local lsp_diagnostics_hold_augroup = vim.api.nvim_create_augroup("lsp_diagnostics_hold", { clear = true })
-          vim.api.nvim_create_autocmd({ "CursorHold" }, {
-            buffer = event.buf,
-            group = lsp_diagnostics_hold_augroup,
-            callback = function()
-              for _, winid in pairs(vim.api.nvim_tabpage_list_wins(0)) do
-                if vim.api.nvim_win_get_config(winid).zindex then
-                  return
-                end
-              end
-              vim.diagnostic.open_float({
-                scope = "cursor",
-                focusable = false,
-                close_events = {
-                  "CursorMoved",
-                  "CursorMovedI",
-                  "BufHidden",
-                  "InsertCharPre",
-                  "WinLeave",
-                },
-              })
-            end
-          })
-          vim.api.nvim_create_autocmd('LspDetach', {
-            group = vim.api.nvim_create_augroup('lsp_diagnostics_hold_detach', { clear = true }),
-            callback = function(event2)
-              vim.lsp.buf.clear_references()
-              vim.api.nvim_clear_autocmds { group = 'lsp_diagnostics_hold', buffer = event2.buf }
-            end,
-          })
-
-          -- The following two autocommands are used to highlight references of the
-          -- word under your cursor when your cursor rests there for a little while.
-          --    See `:help CursorHold` for information about when this is executed
-          --
-          -- When you move your cursor, the highlights will be cleared (the second autocommand).
-          local client = vim.lsp.get_client_by_id(event.data.client_id)
-          if client and client.supports_method(vim.lsp.protocol.Methods.textDocument_documentHighlight) then
-            local highlight_augroup = vim.api.nvim_create_augroup('kickstart-lsp-highlight', { clear = false })
-            vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
-              buffer = event.buf,
-              group = highlight_augroup,
-              callback = vim.lsp.buf.document_highlight,
-            })
-
-            vim.api.nvim_create_autocmd({ 'CursorMoved', 'CursorMovedI' }, {
-              buffer = event.buf,
-              group = highlight_augroup,
-              callback = vim.lsp.buf.clear_references,
-            })
-
-            vim.api.nvim_create_autocmd('LspDetach', {
-              group = vim.api.nvim_create_augroup('kickstart-lsp-detach', { clear = true }),
-              callback = function(event2)
-                vim.lsp.buf.clear_references()
-                vim.api.nvim_clear_autocmds { group = 'kickstart-lsp-highlight', buffer = event2.buf }
-              end,
-            })
-          end
-
-          -- The following code creates a keymap to toggle inlay hints in your
-          -- code, if the language server you are using supports them
-          --
-          -- This may be unwanted, since they displace some of your code
-          if client and client.supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
-            map('<leader>th', function()
-              vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf })
-            end, '[T]oggle Inlay [H]ints')
-          end
         end,
       })
 
@@ -763,7 +692,9 @@ vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = "Open diagn
 -- Disable annoying inline virtual_text lint/lsp errors
 vim.diagnostic.config({
   virtual_text = false,
-  underline = true
+  underline = true,
+  signs = true,
+  update_in_insert = false,
 })
 
 vim.o.equalalways = false
