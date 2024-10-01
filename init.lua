@@ -360,9 +360,9 @@ require('lazy').setup({
   },
 
   -- Multiple cursors with <C-n>
-  -- {
-  --   'mg979/vim-visual-multi',
-  -- },
+  {
+    'mg979/vim-visual-multi',
+  },
 
   -- Powerful search
   {
