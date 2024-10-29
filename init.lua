@@ -24,13 +24,14 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
--- NOTE: Here is where you install your plugins.
---  You can configure plugins using the `config` key.
---
---  You can also configure plugins after the setup call,
---    as they will be available in your neovim runtime.
 require('lazy').setup({
-  -- NOTE: First, some plugins that don't require any configuration
+  checker = {
+    enabled = true,
+    concurrency = 1, ---@type number? set to 1 to check for updates very slowly
+    notify = true, -- get a notification when new updates are found
+    frequency = 86400, -- check for updates every hour
+    check_pinned = false, -- check for pinned packages that can't be updated
+  },
 
   -- Git related plugins
   'tpope/vim-fugitive',
