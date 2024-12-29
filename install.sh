@@ -22,9 +22,9 @@ fish -c "fish /tmp/fish-aliases.sh"
 
 # NVM
 fish -c "fisher install jorgebucaran/nvm.fish"
-fish -c "set --universal nvm_default_version 22.11"
+fish -c "set --universal nvm_default_version 22.12"
 fish -c "set --universal nvm_default_packages yarn nx neovim typescript"
-fish -c "nvm install 22.11"
+fish -c "nvm install 22.12"
 
 # Nx
 fish -c "set -Ux NX_REJECT_UNKNOWN_LOCAL_CACHE 0"
