@@ -2,7 +2,7 @@
 
 DOTFILES_URI=${DOTFILES_URI:-https://github.com/julianpoy/dotfiles}
 
-brew install fish jq python pynvim ripgrep fd neovim
+brew install fish jq python pynvim ripgrep fd neovim tmux tmate
 
 # Fish
 sudo chsh -s /usr/bin/fish $USER
@@ -23,6 +23,9 @@ curl -sL $DOTFILES_URI/raw/master/init.lua -o $HOME/.config/nvim/init.lua
 
 # Tmux config
 curl -sL $DOTFILES_URI/raw/master/.tmux.conf -o $HOME/.tmux.conf
+
+# Tmate config
+curl -sL $DOTFILES_URI/raw/master/.tmate.conf -o $HOME/.tmate.conf
 
 # Git config
 git config --global --add --bool push.autoSetupRemote true

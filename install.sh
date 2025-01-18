@@ -5,7 +5,7 @@ DOTFILES_URI=${DOTFILES_URI:-https://github.com/julianpoy/dotfiles}
 sudo apt-get update
 
 sudo apt-get install -y \
-  curl gcc jq zip unzip htop tmux vim python3 python3-pip \
+  curl gcc jq zip unzip htop tmux tmate vim python3 python3-pip \
   python3-pynvim \
   fish fonts-powerline \
   ripgrep fd-find \
@@ -41,6 +41,9 @@ curl -sL $DOTFILES_URI/raw/master/init.lua -o $HOME/.config/nvim/init.lua
 
 # Tmux config
 curl -sL $DOTFILES_URI/raw/master/.tmux.conf -o $HOME/.tmux.conf
+
+# Tmate config
+curl -sL $DOTFILES_URI/raw/master/.tmate.conf -o $HOME/.tmate.conf
 
 # Git config
 git config --global --add --bool push.autoSetupRemote true
