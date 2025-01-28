@@ -46,4 +46,4 @@ curl -sL $DOTFILES_URI/raw/master/.tmux.conf -o $HOME/.tmux.conf
 curl -sL $DOTFILES_URI/raw/master/.tmate.conf -o $HOME/.tmate.conf
 
 # Git config
-git config --global --add --bool push.autoSetupRemote true
+git config --global --replace-all --bool push.autoSetupRemote true
