@@ -32,7 +32,7 @@ fish -c "set -Ux NX_REJECT_UNKNOWN_LOCAL_CACHE 0"
 # NeoVim
 sudo rm -rf ~/.neovim-bin
 mkdir ~/.neovim-bin
-wget https://github.com/neovim/neovim/releases/download/v0.10.2/nvim-linux64.tar.gz -O ~/.neovim-bin/nvim-linux64.tar.gz
+wget https://github.com/neovim/neovim/releases/download/v0.10.4/nvim-linux64.tar.gz -O ~/.neovim-bin/nvim-linux64.tar.gz
 sudo tar -C ~/.neovim-bin -xzf ~/.neovim-bin/nvim-linux64.tar.gz
 fish -c "alias vim='~/.neovim-bin/nvim-linux64/bin/nvim' && funcsave vim"
 
