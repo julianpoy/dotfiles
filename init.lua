@@ -46,6 +46,7 @@ require('lazy').setup({
     event = "InsertEnter",
     config = function()
       require("copilot").setup({
+        copilot_model = "gpt-4o-copilot",
         suggestion = {
           auto_trigger = true,
           keymap = {
@@ -59,6 +60,30 @@ require('lazy').setup({
         },
       })
     end,
+  },
+
+  {
+    "olimorris/codecompanion.nvim",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "nvim-treesitter/nvim-treesitter",
+      "zbirenbaum/copilot.lua",
+    },
+    config = function()
+      require("codecompanion").setup({
+        strategies = {
+          chat = {
+            adapter = "copilot",
+          },
+          inline = {
+            adapter = "copilot",
+          },
+          cmd = {
+            adapter = "copilot",
+          }
+        },
+      })
+    end
   },
 
   { -- LSP Configuration & Plugins
@@ -251,6 +276,9 @@ require('lazy').setup({
         sources = {
           { name = 'nvim_lsp' },
           { name = 'path' },
+          per_filetype = {
+            codecompanion = { "codecompanion" },
+          }
         },
       }
     end,
@@ -387,14 +415,55 @@ require('lazy').setup({
     'mg979/vim-visual-multi',
   },
 
+  {
+    "folke/trouble.nvim",
+    opts = {}, -- for default options, refer to the configuration section for custom setup.
+    cmd = "Trouble",
+    keys = {
+      {
+        "<leader>xx",
+        "<cmd>Trouble diagnostics toggle<cr>",
+        desc = "Diagnostics (Trouble)",
+      },
+      {
+        "<leader>xX",
+        "<cmd>Trouble diagnostics toggle filter.buf=0<cr>",
+        desc = "Buffer Diagnostics (Trouble)",
+      },
+      {
+        "<leader>cs",
+        "<cmd>Trouble symbols toggle focus=false<cr>",
+        desc = "Symbols (Trouble)",
+      },
+      {
+        "<leader>cl",
+        "<cmd>Trouble lsp toggle focus=false win.position=right<cr>",
+        desc = "LSP Definitions / references / ... (Trouble)",
+      },
+      {
+        "<leader>xL",
+        "<cmd>Trouble loclist toggle<cr>",
+        desc = "Location List (Trouble)",
+      },
+      {
+        "<leader>xQ",
+        "<cmd>Trouble qflist toggle<cr>",
+        desc = "Quickfix List (Trouble)",
+      },
+    },
+  },
+
   -- Powerful search
   {
     'windwp/nvim-spectre',
     config = function()
       local api = require('spectre')
+      api.setup({
+        use_trouble_qf = true,
+      })
       vim.keymap.set('n', '<leader>SG', api.open, { desc = 'Persistent [S]earch [G]lobally' })
     end,
-    dependencies = { 'nvim-lua/plenary.nvim' }
+    dependencies = { 'nvim-lua/plenary.nvim', 'folke/trouble.nvim' },
   },
 
   -- Save when exiting insert mode
@@ -755,12 +824,17 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 
 -- [[ Configure Telescope ]]
 -- See `:help telescope` and `:help telescope.setup()`
+local open_with_trouble = require("trouble.sources.telescope").open
 require('telescope').setup {
   defaults = {
     mappings = {
       i = {
         ['<C-u>'] = false,
         ['<C-d>'] = false,
+        ["<c-t>"] = open_with_trouble,
+      },
+      n = {
+        ["<c-t>"] = open_with_trouble
       },
     },
   },
