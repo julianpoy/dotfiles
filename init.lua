@@ -67,7 +67,18 @@ require('lazy').setup({
     'neovim/nvim-lspconfig',
     dependencies = {
       -- Automatically install LSPs to stdpath for neovim
-      { 'williamboman/mason.nvim', config = true, version = "^1.0.0" },
+      {
+        'williamboman/mason.nvim',
+        version = "^1.0.0",
+        config = function()
+          require("mason").setup()
+
+          -- Auto-update on startup (non-blocking)
+          vim.defer_fn(function()
+            require("mason.api.command").MasonUpdate()
+          end, 100)
+        end,
+      },
       { 'williamboman/mason-lspconfig.nvim', version = "^1.0.0" },
       'WhoIsSethDaniel/mason-tool-installer.nvim',
 
