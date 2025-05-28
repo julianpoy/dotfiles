@@ -400,11 +400,45 @@ require('lazy').setup({
     'nvim-lualine/lualine.nvim',
     dependencies = { 'nvim-tree/nvim-web-devicons' },
     config = function()
+      local kanagawa_palette = require("kanagawa.colors").setup().palette
+      local kanagawa_theme = require("kanagawa.colors").setup().theme
+
+      local theme = {
+        normal = {
+          a = { bg = kanagawa_palette.waveBlue2, fg = kanagawa_theme.ui.fg },
+          b = { bg = kanagawa_theme.ui.bg_m1, fg = kanagawa_theme.ui.fg },
+          c = { bg = kanagawa_theme.ui.bg_p3, fg = kanagawa_theme.ui.fg_dim },
+        },
+        insert = {
+          a = { bg = kanagawa_palette.autumnGreen, fg = kanagawa_theme.ui.bg },
+        },
+        command = {
+          a = { bg = kanagawa_theme.syn.operator, fg = kanagawa_theme.ui.bg },
+        },
+        visual = {
+          a = { bg = kanagawa_theme.syn.keyword, fg = kanagawa_theme.ui.bg },
+        },
+        replace = {
+          a = { bg = kanagawa_theme.syn.constant, fg = kanagawa_theme.ui.bg },
+        },
+        inactive = {
+          a = { bg = kanagawa_theme.ui.bg_m3, fg = kanagawa_theme.ui.fg_dim },
+          b = { bg = kanagawa_theme.ui.bg_m3, fg = kanagawa_theme.ui.fg_dim },
+          c = { bg = kanagawa_theme.ui.bg_m3, fg = kanagawa_theme.ui.fg_dim },
+        },
+      }
+
       require('lualine').setup {
         options = {
-          theme = 'kanagawa',
+          theme = theme,
         },
         sections = {
+          lualine_c = {
+            {
+              'filename',
+              path = 1, -- 0: just the filename, 1: relative path, 2: absolute path
+            },
+          },
           lualine_x = {
             'filetype',
             {
