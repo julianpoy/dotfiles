@@ -26,14 +26,6 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 require('lazy').setup({
-  checker = {
-    enabled = true,
-    concurrency = 1, ---@type number? set to 1 to check for updates very slowly
-    notify = true, -- get a notification when new updates are found
-    frequency = 86400, -- check for updates every hour
-    check_pinned = true, -- check for pinned packages that can't be updated
-  },
-
   -- Git related plugins
   'tpope/vim-fugitive',
   'tpope/vim-rhubarb',
@@ -114,14 +106,14 @@ require('lazy').setup({
         end)
 
         -- Customize how cursors look.
-        local hl = vim.api.nvim_set_hl
-        hl(0, "MultiCursorCursor", { reverse = true })
-        hl(0, "MultiCursorVisual", { link = "Visual" })
-        hl(0, "MultiCursorSign", { link = "SignColumn"})
-        hl(0, "MultiCursorMatchPreview", { link = "Search" })
-        hl(0, "MultiCursorDisabledCursor", { reverse = true })
-        hl(0, "MultiCursorDisabledVisual", { link = "Visual" })
-        hl(0, "MultiCursorDisabledSign", { link = "SignColumn"})
+        -- local hl = vim.api.nvim_set_hl
+        -- hl(0, "MultiCursorCursor", { reverse = true })
+        -- hl(0, "MultiCursorVisual", { link = "Visual" })
+        -- hl(0, "MultiCursorSign", { link = "SignColumn"})
+        -- hl(0, "MultiCursorMatchPreview", { link = "Search" })
+        -- hl(0, "MultiCursorDisabledCursor", { reverse = true })
+        -- hl(0, "MultiCursorDisabledVisual", { link = "Visual" })
+        -- hl(0, "MultiCursorDisabledSign", { link = "SignColumn"})
     end
   },
 
@@ -147,7 +139,8 @@ require('lazy').setup({
       -- Useful status updates for LSP
       { 'j-hui/fidget.nvim', opts = {} },
 
-      'hrsh7th/cmp-nvim-lsp',
+      -- Autocompletion
+      'saghen/blink.cmp',
 
       'yioneko/nvim-vtsls', -- A plugin for VTSLS, not really a great place to put it but oh well
     },
@@ -200,10 +193,9 @@ require('lazy').setup({
 
       -- LSP servers and clients are able to communicate to each other what features they support.
       --  By default, Neovim doesn't support everything that is in the LSP specification.
-      --  When you add nvim-cmp, luasnip, etc. Neovim now has *more* capabilities.
-      --  So, we create new capabilities with nvim cmp, and then broadcast that to the servers.
-      local capabilities = vim.lsp.protocol.make_client_capabilities()
-      capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
+      --  When you add blink.cmp, luasnip, etc. Neovim now has *more* capabilities.
+      --  So, we create new capabilities with blink.cmp, and then broadcast that to the servers.
+      local capabilities = require('blink.cmp').get_lsp_capabilities()
 
       -- Enable the following language servers
       --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
@@ -289,51 +281,47 @@ require('lazy').setup({
   },
 
   { -- Autocompletion
-    'hrsh7th/nvim-cmp',
-    event = 'InsertEnter',
-    dependencies = {
-      'hrsh7th/cmp-path',
-      'hrsh7th/cmp-nvim-lsp',
-    },
-    config = function()
-      local cmp = require 'cmp'
+    'saghen/blink.cmp',
+    event = 'VimEnter',
+    version = '1.*',
+    dependencies = { 'L3MON4D3/LuaSnip', version = 'v2.*' },
+    --- @module 'blink.cmp'
+    --- @type blink.cmp.Config
+    opts = {
+      keymap = {
+        preset = 'none',
 
-      cmp.setup {
-        performance = {
-          max_view_entries = 10,
-        },
-        completion = { completeopt = 'menu,menuone,noselect' },
-        matching = {
-          disallow_fuzzy_matching = true,
-          disallow_fullfuzzy_matching = true,
-          disallow_partial_fuzzy_matching = true,
-          disallow_partial_matching = true,
-          disallow_prefix_unmatching = false,
-        },
-        formatting = {
-          format = function(entry, vim_item)
-            vim_item.abbr = string.sub(vim_item.abbr, 1, 20)
-            return vim_item
-          end
-        },
+        ['<CR>'] = { 'accept', 'fallback' },
 
-        mapping = cmp.mapping.preset.insert {
-          ['<CR>'] = cmp.mapping.confirm {
-            behavior = cmp.ConfirmBehavior.Replace,
-            select = false,
-          },
-          ['<Tab>'] = cmp.mapping.select_next_item(),
-          ['<S-Tab>'] = cmp.mapping.select_prev_item(),
-        },
-        sources = {
-          { name = 'nvim_lsp' },
-          { name = 'path' },
-          per_filetype = {
-            codecompanion = { "codecompanion" },
+        ['<S-Tab>'] = { 'select_prev', 'fallback' },
+        ['<Tab>'] = { 'select_next', 'fallback' },
+      },
+      snippets = { preset = 'luasnip' },
+      sources = {
+        default = { 'lsp', 'path', 'snippets', 'buffer' },
+      },
+      fuzzy = {
+        implementation = "prefer_rust_with_warning"
+      },
+      completion = {
+        list = {
+          selection = {
+            preselect = false,
+            auto_insert = true
           }
         },
-      }
-    end,
+        documentation = {
+          auto_show = true,
+          auto_show_delay_ms = 500,
+        }
+      },
+      signature = {
+        enabled = true,
+        window = {
+          show_documentation = false,
+        },
+      },
+    },
   },
 
   { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
@@ -406,6 +394,30 @@ require('lazy').setup({
     end,
     lazy = false,
     priority = 1000
+  },
+
+  {
+    'nvim-lualine/lualine.nvim',
+    dependencies = { 'nvim-tree/nvim-web-devicons' },
+    config = function()
+      require('lualine').setup {
+        options = {
+          theme = 'kanagawa',
+        },
+        sections = {
+          lualine_x = {
+            'filetype',
+            {
+              function()
+                return require("lazy.status").updates()
+              end,
+              cond = require("lazy.status").has_updates,
+              color = { fg = "#ff9e64" },
+            },
+          },
+        },
+      }
+    end,
   },
 
   -- Add indentation guides even on blank lines
@@ -495,6 +507,7 @@ require('lazy').setup({
 
   {
     'nvim-tree/nvim-tree.lua',
+    dependencies = { 'nvim-tree/nvim-web-devicons' },
     opts = {
     },
     config = function()
@@ -541,7 +554,7 @@ require('lazy').setup({
         renderer = {
           add_trailing = true,
           icons = {
-            webdev_colors = false,
+            webdev_colors = true,
             git_placement = "after",
             glyphs = {
               default = "",
@@ -714,6 +727,7 @@ require('lazy').setup({
   -- Highlight code
   {
     'nvim-treesitter/nvim-treesitter',
+    branch = 'master',
     build = ":TSUpdate",
     main = 'nvim-treesitter.configs',
     opts = {
@@ -886,6 +900,14 @@ require('lazy').setup({
       dap.listeners.before.event_exited['dapui_config'] = dapui.close
     end,
   }
+}, {
+  checker = {
+    enabled = true,
+    concurrency = 4, ---@type number? set to 1 to check for updates very slowly
+    notify = false, -- get a notification when new updates are found
+    frequency = 86400, -- check for updates every day
+    check_pinned = true, -- check for pinned packages that can't be updated
+  },
 })
 
 -- [[ Setting options ]]
@@ -966,6 +988,10 @@ vim.keymap.set('v', '<A-k>', ':m \'<-2<CR>gv=gv', { silent = true })
 -- Smooth scrolling (scroll one line at a time)
 vim.keymap.set({ 'n', 'v', 'i' }, '<ScrollWheelUp>', '<C-Y>', { silent = true })
 vim.keymap.set({ 'n', 'v', 'i' }, '<ScrollWheelDown>', '<C-E>', { silent = true })
+
+-- Maintenance keymaps
+vim.keymap.set("n", "<leader>Mp", ":Lazy check<CR>", { desc = "[M]aintenance Update [P]lugins" })
+vim.keymap.set("n", "<leader>Ml", ":MasonUpdate<CR>", { desc = "[M]aintenance Update [L]SP (Mason)" })
 
 -- [[ Highlight on yank ]]
 -- See `:help vim.highlight.on_yank()`
