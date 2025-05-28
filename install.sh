@@ -1,6 +1,8 @@
 #!/bin/bash
 
-DOTFILES_URI=${DOTFILES_URI:-https://github.com/julianpoy/dotfiles}
+set -e
+
+DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 sudo apt-get update
 
@@ -14,11 +16,10 @@ sudo apt-get install -y \
 sudo apt-get install -y netcat || sudo apt-get install -y netcat-openbsd
 
 # Fish
-sudo chsh -s /usr/bin/fish $USER
+sudo chsh -s /usr/bin/fish "$USER"
 fish -c "curl -sL https://git.io/fisher | source && fisher install jorgebucaran/fisher"
 fish -c "fisher install oh-my-fish/theme-bobthefish"
-curl -sL $DOTFILES_URI/raw/master/fish-aliases.sh -o /tmp/fish-aliases.sh
-fish -c "fish /tmp/fish-aliases.sh"
+fish -c "fish \"$DOTFILES_DIR/fish-aliases.sh\""
 
 # NVM
 fish -c "fisher install jorgebucaran/nvm.fish"
@@ -37,14 +38,15 @@ sudo tar -C ~/.neovim-bin -xzf ~/.neovim-bin/nvim-linux-x86_64.tar.gz
 fish -c "alias vim='~/.neovim-bin/nvim-linux-x86_64/bin/nvim' && funcsave vim"
 git config --global core.editor "~/.neovim-bin/nvim-linux-x86_64/bin/nvim"
 
-mkdir -p $HOME/.config/nvim
-curl -sL $DOTFILES_URI/raw/master/init.lua -o $HOME/.config/nvim/init.lua
+mkdir -p "$HOME/.config/nvim"
+ln -sf "$DOTFILES_DIR/init.lua" "$HOME/.config/nvim/init.lua"
 
 # Tmux config
-curl -sL $DOTFILES_URI/raw/master/.tmux.conf -o $HOME/.tmux.conf
+ln -sf "$DOTFILES_DIR/.tmux.conf" "$HOME/.tmux.conf"
 
 # Tmate config
-curl -sL $DOTFILES_URI/raw/master/.tmate.conf -o $HOME/.tmate.conf
+ln -sf "$DOTFILES_DIR/.tmate.conf" "$HOME/.tmate.conf"
 
 # Git config
 git config --global --replace-all --bool push.autoSetupRemote true
+
