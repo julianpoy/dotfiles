@@ -9,18 +9,19 @@ vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
 -- Install package manager
---    https://github.com/folke/lazy.nvim
---    `:help lazy.nvim.txt` for more info
-local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
-if not vim.loop.fs_stat(lazypath) then
-  vim.fn.system {
-    'git',
-    'clone',
-    '--filter=blob:none',
-    'https://github.com/folke/lazy.nvim.git',
-    '--branch=stable', -- latest stable release
-    lazypath,
-  }
+local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+if not (vim.uv or vim.loop).fs_stat(lazypath) then
+  local lazyrepo = "https://github.com/folke/lazy.nvim.git"
+  local out = vim.fn.system({ "git", "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath })
+  if vim.v.shell_error ~= 0 then
+    vim.api.nvim_echo({
+      { "Failed to clone lazy.nvim:\n", "ErrorMsg" },
+      { out, "WarningMsg" },
+      { "\nPress any key to exit..." },
+    }, true, {})
+    vim.fn.getchar()
+    os.exit(1)
+  end
 end
 vim.opt.rtp:prepend(lazypath)
 
@@ -30,7 +31,7 @@ require('lazy').setup({
     concurrency = 1, ---@type number? set to 1 to check for updates very slowly
     notify = true, -- get a notification when new updates are found
     frequency = 86400, -- check for updates every hour
-    check_pinned = false, -- check for pinned packages that can't be updated
+    check_pinned = true, -- check for pinned packages that can't be updated
   },
 
   -- Git related plugins
@@ -60,30 +61,6 @@ require('lazy').setup({
         },
       })
     end,
-  },
-
-  {
-    "olimorris/codecompanion.nvim",
-    dependencies = {
-      "nvim-lua/plenary.nvim",
-      "nvim-treesitter/nvim-treesitter",
-      "zbirenbaum/copilot.lua",
-    },
-    config = function()
-      require("codecompanion").setup({
-        strategies = {
-          chat = {
-            adapter = "copilot",
-          },
-          inline = {
-            adapter = "copilot",
-          },
-          cmd = {
-            adapter = "copilot",
-          }
-        },
-      })
-    end
   },
 
   { -- LSP Configuration & Plugins
@@ -289,7 +266,6 @@ require('lazy').setup({
     "folke/ts-comments.nvim",
     opts = {},
     event = "VeryLazy",
-    enabled = vim.fn.has("nvim-0.10.0") == 1,
   },
 
   -- Useful plugin to show you pending keybinds.
@@ -374,40 +350,6 @@ require('lazy').setup({
   --       },
   --     }
   --   end
-  -- },
-
-  -- Adds automatic pairs when typing various symbols
-  -- {
-  --   'windwp/nvim-autopairs',
-  --   event = 'InsertEnter',
-  --   -- Optional dependency
-  --   dependencies = { 'hrsh7th/nvim-cmp' },
-  --   config = function()
-  --     require('nvim-autopairs').setup {}
-  --     -- If you want to automatically add `(` after selecting a function or method
-  --     local cmp_autopairs = require 'nvim-autopairs.completion.cmp'
-  --     local cmp = require 'cmp'
-  --     cmp.event:on('confirm_done', cmp_autopairs.on_confirm_done())
-  --
-  --     local npairs = require'nvim-autopairs'
-  --     local Rule = require'nvim-autopairs.rule'
-  --     local cond = require 'nvim-autopairs.conds'
-  --     npairs.add_rule(Rule('<', '>', {
-  --       -- if you use nvim-ts-autotag, you may want to exclude these filetypes from this rule
-  --       -- so that it doesn't conflict with nvim-ts-autotag
-  --       '-html',
-  --       '-javascriptreact',
-  --       '-typescriptreact',
-  --     }):with_pair(
-  --       -- regex will make it so that it will auto-pair on
-  --       -- `a<` but not `a <`
-  --       -- The `:?:?` part makes it also
-  --       -- work on Rust generics like `some_func::<T>()`
-  --       cond.before_regex('%a+:?:?$', 3)
-  --     ):with_move(function(opts)
-  --       return opts.char == '>'
-  --     end))
-  --   end,
   -- },
 
   -- Multiple cursors with <C-n>
@@ -589,7 +531,7 @@ require('lazy').setup({
   -- Fuzzy Finder (files, lsp, etc)
   {
     'nvim-telescope/telescope.nvim',
-    version = '*',
+    branch = '0.1.x',
     dependencies = {
       'nvim-lua/plenary.nvim'
     }
@@ -869,13 +811,6 @@ require('lazy').setup({
       dap.listeners.before.event_exited['dapui_config'] = dapui.close
     end,
   }
-}, {
-  checker = {
-    -- automatically check for plugin updates
-    enabled = false,
-    notify = false,   -- get a notification when new updates are found
-    frequency = 3600, -- check for updates every hour
-  },
 })
 
 -- [[ Setting options ]]
