@@ -65,8 +65,8 @@ require('lazy').setup({
         local set = vim.keymap.set
 
         -- Add or skip cursor above/below the main cursor.
-        set({"n", "x"}, "<up>", function() mc.lineAddCursor(-1) end)
-        set({"n", "x"}, "<down>", function() mc.lineAddCursor(1) end)
+        set({"n", "x"}, "<leader><up>", function() mc.lineAddCursor(-1) end)
+        set({"n", "x"}, "<leader><down>", function() mc.lineAddCursor(1) end)
         -- set({"n", "x"}, "<leader><up>", function() mc.lineSkipCursor(-1) end)
         -- set({"n", "x"}, "<leader><down>", function() mc.lineSkipCursor(1) end)
 
@@ -89,8 +89,8 @@ require('lazy').setup({
         mc.addKeymapLayer(function(layerSet)
 
             -- Select a different cursor as the main one.
-            layerSet({"n", "x"}, "<left>", mc.prevCursor)
-            layerSet({"n", "x"}, "<right>", mc.nextCursor)
+            layerSet({"n", "x"}, "<leader><left>", mc.prevCursor)
+            layerSet({"n", "x"}, "<leader><right>", mc.nextCursor)
 
             -- Delete the main cursor.
             layerSet({"n", "x"}, "<leader>x", mc.deleteCursor)
