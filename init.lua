@@ -41,7 +41,7 @@ require('lazy').setup({
       require("copilot").setup({
         copilot_model = "gpt-4o-copilot",
         suggestion = {
-          auto_trigger = true,
+          auto_trigger = false,
           keymap = {
             accept = "<M-a>",
             accept_line = "<M-l>",
