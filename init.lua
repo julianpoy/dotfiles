@@ -627,11 +627,11 @@ require('lazy').setup({
         })
       end
 
-      local nvimtreeView = require('nvim-tree.view')
       local function closeIfNvimtreeFocused()
-        if nvimtreeView.is_visible then
-          nvimtreeApi.tree.close()
-        end
+        -- local nvimtreeView = require('nvim-tree.view')
+        -- if nvimtreeView.is_visible then
+        nvimtreeApi.tree.close()
+        -- end
       end
 
       vim.keymap.set('n', '<leader>t', toggle, { desc = 'File [T]ree' })
