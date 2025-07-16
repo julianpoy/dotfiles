@@ -27,9 +27,6 @@ fish -c "set --universal nvm_default_version 22.12"
 fish -c "set --universal nvm_default_packages yarn nx neovim typescript tsx"
 fish -c "nvm install 22.12"
 
-# Nx
-fish -c "set -Ux NX_REJECT_UNKNOWN_LOCAL_CACHE 0"
-
 # NeoVim
 sudo rm -rf ~/.neovim-bin
 mkdir ~/.neovim-bin
