@@ -47,3 +47,8 @@ ln -sf "$DOTFILES_DIR/.tmate.conf" "$HOME/.tmate.conf"
 # Git config
 git config --global --replace-all --bool push.autoSetupRemote true
 
+# Run local install.sh for machine-local config if exists
+if [ -f ~/install.sh ]; then
+  bash ~/install.sh
+fi
+
