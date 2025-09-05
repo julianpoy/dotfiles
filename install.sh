@@ -23,16 +23,17 @@ fish -c "fish \"$DOTFILES_DIR/fish-aliases.sh\""
 
 # NVM
 fish -c "fisher install jorgebucaran/nvm.fish"
-fish -c "set --universal nvm_default_version 22.12"
+$DOTFILES_DIR/nvmInstallVersion.sh 24.7
+fish -c "set --universal nvm_default_version 24.7"
 fish -c "set --universal nvm_default_packages yarn nx neovim typescript tsx"
-fish -c "nvm install 22.12"
 
 # NeoVim
 sudo rm -rf ~/.neovim-bin
 mkdir ~/.neovim-bin
-wget https://github.com/neovim/neovim/releases/download/v0.11.3/nvim-linux-x86_64.tar.gz -O ~/.neovim-bin/nvim-linux-x86_64.tar.gz
+wget https://github.com/neovim/neovim/releases/download/v0.11.4/nvim-linux-x86_64.tar.gz -O ~/.neovim-bin/nvim-linux-x86_64.tar.gz
 sudo tar -C ~/.neovim-bin -xzf ~/.neovim-bin/nvim-linux-x86_64.tar.gz
 fish -c "alias vim='~/.neovim-bin/nvim-linux-x86_64/bin/nvim' && funcsave vim"
+fish -c "alias nvim='~/.neovim-bin/nvim-linux-x86_64/bin/nvim' && funcsave nvim"
 git config --global core.editor "~/.neovim-bin/nvim-linux-x86_64/bin/nvim"
 
 mkdir -p "$HOME/.config/nvim"
