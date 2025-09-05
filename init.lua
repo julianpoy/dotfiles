@@ -56,6 +56,30 @@ require('lazy').setup({
   },
 
   {
+    "olimorris/codecompanion.nvim",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "nvim-treesitter/nvim-treesitter",
+      "zbirenbaum/copilot.lua",
+    },
+    config = function()
+      require("codecompanion").setup({
+        strategies = {
+          chat = {
+            adapter = "copilot",
+          },
+          inline = {
+            adapter = "copilot",
+          },
+          cmd = {
+            adapter = "copilot",
+          }
+        },
+      })
+    end
+  },
+
+  {
     "jake-stewart/multicursor.nvim",
     branch = "1.0",
     config = function()
@@ -123,7 +147,7 @@ require('lazy').setup({
       -- Automatically install LSPs to stdpath for neovim
       {
         'williamboman/mason.nvim',
-        version = "^1.0.0",
+        version = "*",
         config = function()
           require("mason").setup()
 
@@ -133,7 +157,7 @@ require('lazy').setup({
           end, 100)
         end,
       },
-      { 'williamboman/mason-lspconfig.nvim', version = "^1.0.0" },
+      { 'williamboman/mason-lspconfig.nvim', version = "*" },
       'WhoIsSethDaniel/mason-tool-installer.nvim',
 
       -- Useful status updates for LSP
