@@ -23,8 +23,8 @@ fish -c "fish \"$DOTFILES_DIR/fish-aliases.sh\""
 
 # NVM
 fish -c "fisher install jorgebucaran/nvm.fish"
-$DOTFILES_DIR/nvmInstallVersion.sh 24.7
-fish -c "set --universal nvm_default_version 24.7"
+$DOTFILES_DIR/nvmInstallVersion.sh v24.7.0
+fish -c "set --universal nvm_default_version v24.7.0"
 fish -c "set --universal nvm_default_packages yarn nx neovim typescript tsx"
 
 # NeoVim
