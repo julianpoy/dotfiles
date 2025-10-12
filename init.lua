@@ -56,27 +56,85 @@ require('lazy').setup({
   },
 
   {
-    "olimorris/codecompanion.nvim",
+    "yetone/avante.nvim",
+    -- if you want to build from source then do `make BUILD_FROM_SOURCE=true`
+    -- ⚠️ must add this setting! ! !
+    build = vim.fn.has("win32") ~= 0
+        and "powershell -ExecutionPolicy Bypass -File Build.ps1 -BuildFromSource false"
+        or "make",
+    event = "VeryLazy",
+    version = false, -- Never set this value to "*"! Never!
+    ---@module 'avante'
+    ---@type avante.Config
+    opts = {
+      -- add any opts here
+      -- this file can contain specific instructions for your project
+      instructions_file = "avante.md",
+      -- for example
+      provider = "claude",
+      providers = {
+        claude = {
+          endpoint = "https://api.anthropic.com",
+          model = "claude-sonnet-4-20250514",
+          timeout = 30000, -- Timeout in milliseconds
+            extra_request_body = {
+              temperature = 0.75,
+              max_tokens = 20480,
+            },
+        },
+      },
+      acp_providers = {
+        ["claude-code"] = {
+          command = "npx",
+          args = { "@zed-industries/claude-code-acp" },
+          env = {
+            NODE_NO_WARNINGS = "1",
+            ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY"),
+          },
+        },
+      },
+      selection = {
+        enabled = false,
+      },
+    },
     dependencies = {
       "nvim-lua/plenary.nvim",
-      "nvim-treesitter/nvim-treesitter",
-      "zbirenbaum/copilot.lua",
-    },
-    config = function()
-      require("codecompanion").setup({
-        strategies = {
-          chat = {
-            adapter = "copilot",
+      "MunifTanjim/nui.nvim",
+      --- The below dependencies are optional,
+      "nvim-mini/mini.pick", -- for file_selector provider mini.pick
+      "nvim-telescope/telescope.nvim", -- for file_selector provider telescope
+      "hrsh7th/nvim-cmp", -- autocompletion for avante commands and mentions
+      "ibhagwan/fzf-lua", -- for file_selector provider fzf
+      "stevearc/dressing.nvim", -- for input provider dressing
+      "folke/snacks.nvim", -- for input provider snacks
+      "nvim-tree/nvim-web-devicons", -- or echasnovski/mini.icons
+      "zbirenbaum/copilot.lua", -- for providers='copilot'
+      {
+        -- support for image pasting
+        "HakonHarnes/img-clip.nvim",
+        event = "VeryLazy",
+        opts = {
+          -- recommended settings
+          default = {
+            embed_image_as_base64 = false,
+            prompt_for_file_name = false,
+            drag_and_drop = {
+              insert_mode = true,
+            },
+            -- required for Windows users
+            use_absolute_path = true,
           },
-          inline = {
-            adapter = "copilot",
-          },
-          cmd = {
-            adapter = "copilot",
-          }
         },
-      })
-    end
+      },
+      {
+        -- Make sure to set this up properly if you have lazy=true
+        'MeanderingProgrammer/render-markdown.nvim',
+        opts = {
+          file_types = { "Avante" },
+        },
+        ft = { "Avante" },
+      },
+    },
   },
 
   {
@@ -143,11 +201,13 @@ require('lazy').setup({
 
   { -- LSP Configuration & Plugins
     'neovim/nvim-lspconfig',
+    event = 'VeryLazy',
+    cmd = { 'LspInfo', 'LspInstall', 'LspUninstall' },
     dependencies = {
       -- Automatically install LSPs to stdpath for neovim
       {
-        'williamboman/mason.nvim',
-        version = "*",
+        'mason-org/mason.nvim',
+        opts = {},
         config = function()
           require("mason").setup()
 
@@ -157,7 +217,7 @@ require('lazy').setup({
           end, 100)
         end,
       },
-      { 'williamboman/mason-lspconfig.nvim', version = "*" },
+      { 'mason-org/mason-lspconfig.nvim', version = "*" },
       'WhoIsSethDaniel/mason-tool-installer.nvim',
 
       -- Useful status updates for LSP
@@ -231,57 +291,56 @@ require('lazy').setup({
       --  - settings (table): Override the default settings passed when initializing the server.
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
-        vtsls = {
-          settings = {
-            vtsls = {
-              experimental = {
-                completion = {
-                  enableServerSideFuzzyMatch = true,
-                  entriesLimit = 15,
+        mason = {
+          vtsls = {
+            settings = {
+              vtsls = {
+                experimental = {
+                  completion = {
+                    enableServerSideFuzzyMatch = true,
+                    entriesLimit = 15,
+                  },
                 },
               },
-            },
-            typescript = {
-              inlayHints = {
-                parameterNames = { enabled = "literals" },
-                parameterTypes = { enabled = true },
-                variableTypes = { enabled = true },
-                propertyDeclarationTypes = { enabled = true },
-                functionLikeReturnTypes = { enabled = true },
-                enumMemberValues = { enabled = true },
+              typescript = {
+                inlayHints = {
+                  parameterNames = { enabled = "literals" },
+                  parameterTypes = { enabled = true },
+                  variableTypes = { enabled = true },
+                  propertyDeclarationTypes = { enabled = true },
+                  functionLikeReturnTypes = { enabled = true },
+                  enumMemberValues = { enabled = true },
+                },
+                preferGoToSourceDefinition = true,
+                tsserver = {
+                  maxTsServerMemory = 16384,
+                },
+                preferences = {
+                  importModuleSpecifier = "project-relative",
+                  preferTypeOnlyAutoImports = true,
+                  renameMatchingJsxTags = true,
+                },
               },
-              preferGoToSourceDefinition = true,
-              tsserver = {
-                maxTsServerMemory = 16384,
-              },
-              preferences = {
-                importModuleSpecifier = "project-relative",
-                preferTypeOnlyAutoImports = true,
-                renameMatchingJsxTags = true,
-              },
-            },
-            javascript = {
-              preferGoToSourceDefinition = true,
-              preferences = {
-                importModuleSpecifier = "project-relative",
-                renameMatchingJsxTags = true,
+              javascript = {
+                preferGoToSourceDefinition = true,
+                preferences = {
+                  importModuleSpecifier = "project-relative",
+                  renameMatchingJsxTags = true,
+                },
               },
             },
           },
         },
+        -- This table contains config for all language servers that are *not* installed via Mason.
+        others = {
+          -- dartls = {},
+        },
       }
 
-      -- Ensure the servers and tools above are installed
-      --  To check the current status of installed tools and/or manually install
-      --  other tools, you can run
-      --    :Mason
-      --
-      --  You can press `g?` for help in this menu.
-      require('mason').setup()
 
       -- You can add other tools here that you want Mason to install
       -- for you, so that they are available from within Neovim.
-      local ensure_installed = vim.tbl_keys(servers or {})
+      local ensure_installed = vim.tbl_keys(servers.mason or {})
       vim.list_extend(ensure_installed, {
         'stylua', -- Used to format Lua code
         'vtsls',
@@ -289,18 +348,26 @@ require('lazy').setup({
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
+      -- Either merge all additional server configs from the `servers.mason` and `servers.others` tables
+      -- to the default language server configs as provided by nvim-lspconfig or
+      -- define a custom server config that's unavailable on nvim-lspconfig.
+      for server, config in pairs(vim.tbl_extend('keep', servers.mason, servers.others)) do
+        if not vim.tbl_isempty(config) then
+          vim.lsp.config(server, config)
+        end
+      end
+
+      vim.api.nvim_command('MasonToolsInstall')
+
       require('mason-lspconfig').setup {
-        handlers = {
-          function(server_name)
-            local server = servers[server_name] or {}
-            -- This handles overriding only values explicitly passed
-            -- by the server configuration above. Useful when disabling
-            -- certain features of an LSP (for example, turning off formatting for tsserver)
-            server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
-            require('lspconfig')[server_name].setup(server)
-          end,
-        },
+        ensure_installed = {}, -- explicitly set to an empty table (Kickstart populates installs via mason-tool-installer)
+        automatic_enable = true,
       }
+
+      -- Manually run vim.lsp.enable for all language servers that are *not* installed via Mason
+      if not vim.tbl_isempty(servers.others) then
+        vim.lsp.enable(vim.tbl_keys(servers.others))
+      end
     end,
   },
 
@@ -323,9 +390,6 @@ require('lazy').setup({
       snippets = { preset = 'luasnip' },
       sources = {
         default = { 'lsp', 'path', 'snippets' },
-        per_filetype = {
-          codecompanion = { "codecompanion" },
-        }
       },
       fuzzy = {
         implementation = "prefer_rust_with_warning"
@@ -828,7 +892,7 @@ require('lazy').setup({
       'nvim-neotest/nvim-nio',
 
       -- Installs the debug adapters for you
-      'williamboman/mason.nvim',
+      'mason-org/mason.nvim',
       'jay-babu/mason-nvim-dap.nvim',
 
       -- Add your own debuggers here
