@@ -323,6 +323,9 @@ require('lazy').setup({
       snippets = { preset = 'luasnip' },
       sources = {
         default = { 'lsp', 'path', 'snippets' },
+        per_filetype = {
+          codecompanion = { "codecompanion" },
+        }
       },
       fuzzy = {
         implementation = "prefer_rust_with_warning"
