@@ -2,7 +2,7 @@
 
 DOTFILES_URI=${DOTFILES_URI:-https://github.com/julianpoy/dotfiles}
 
-brew install fish jq python pynvim ripgrep fd neovim tmux tmate
+brew install fish jq btop python pynvim ripgrep fd neovim tmux tmate
 
 # Fish
 sudo chsh -s /usr/bin/fish $USER

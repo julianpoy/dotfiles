@@ -7,7 +7,7 @@ DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 sudo apt-get update
 
 sudo apt-get install -y \
-  curl gcc jq zip unzip htop tmux tmate vim python3 python3-pip \
+  curl gcc jq zip unzip btop tmux tmate vim python3 python3-pip \
   python3-pynvim \
   fish fonts-powerline \
   ripgrep fd-find \
