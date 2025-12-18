@@ -903,6 +903,11 @@ require('lazy').setup({
         desc = 'Debug: Step Out',
       },
       {
+        '<F7>',
+        '<cmd>DapViewToggle<CR>',
+        desc = 'Debug: Toggle DAP View',
+      },
+      {
         '<leader>b',
         function()
           require('dap').toggle_breakpoint()

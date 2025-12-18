@@ -36,3 +36,5 @@ alias dc "docker-compose"
 funcsave dc
 alias k "kubectl"
 funcsave k
+alias htop "btop"
+funcsave htop
