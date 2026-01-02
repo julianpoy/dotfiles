@@ -124,6 +124,8 @@ require('lazy').setup({
 
       -- Autocompletion
       'saghen/blink.cmp',
+
+      'yioneko/nvim-vtsls', -- A plugin for VTSLS, not really a great place to put it but oh well
     },
     config = function()
       vim.api.nvim_create_autocmd('LspAttach', {
@@ -143,10 +145,10 @@ require('lazy').setup({
           map('<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols')
           map('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
           map('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction', { 'n', 'x' })
-          -- map('<leader>cao', require('vtsls').commands.organize_imports, '[C]ode [A]ction [O]rganize Imports (TS & JS only)')
-          -- map('<leader>carm', require('vtsls').commands.remove_unused, '[C]ode [A]ction [R]re[m]ove Unused (TS & JS only)')
-          -- map('<leader>cai', require('vtsls').commands.remove_unused, '[C]ode [A]ction [I]mport All (TS & JS only)')
-          -- map('<leader>caf', require('vtsls').commands.fix_all, '[C]ode [A]ction [F]ix All (TS & JS only)')
+          map('<leader>cao', require('vtsls').commands.organize_imports, '[C]ode [A]ction [O]rganize Imports (TS & JS only)')
+          map('<leader>carm', require('vtsls').commands.remove_unused, '[C]ode [A]ction [R]re[m]ove Unused (TS & JS only)')
+          map('<leader>cai', require('vtsls').commands.remove_unused, '[C]ode [A]ction [I]mport All (TS & JS only)')
+          map('<leader>caf', require('vtsls').commands.fix_all, '[C]ode [A]ction [F]ix All (TS & JS only)')
           map('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
         end,
       })
@@ -189,44 +191,44 @@ require('lazy').setup({
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
         mason = {
-          -- vtsls = {
-          --   settings = {
-          --     vtsls = {
-          --       experimental = {
-          --         completion = {
-          --           enableServerSideFuzzyMatch = true,
-          --           entriesLimit = 15,
-          --         },
-          --       },
-          --     },
-          --     typescript = {
-          --       inlayHints = {
-          --         parameterNames = { enabled = "literals" },
-          --         parameterTypes = { enabled = true },
-          --         variableTypes = { enabled = true },
-          --         propertyDeclarationTypes = { enabled = true },
-          --         functionLikeReturnTypes = { enabled = true },
-          --         enumMemberValues = { enabled = true },
-          --       },
-          --       preferGoToSourceDefinition = true,
-          --       tsserver = {
-          --         maxTsServerMemory = 16384,
-          --       },
-          --       preferences = {
-          --         importModuleSpecifier = "project-relative",
-          --         preferTypeOnlyAutoImports = true,
-          --         renameMatchingJsxTags = true,
-          --       },
-          --     },
-          --     javascript = {
-          --       preferGoToSourceDefinition = true,
-          --       preferences = {
-          --         importModuleSpecifier = "project-relative",
-          --         renameMatchingJsxTags = true,
-          --       },
-          --     },
-          --   },
-          -- },
+          vtsls = {
+            settings = {
+              vtsls = {
+                experimental = {
+                  completion = {
+                    enableServerSideFuzzyMatch = true,
+                    entriesLimit = 15,
+                  },
+                },
+              },
+              typescript = {
+                inlayHints = {
+                  parameterNames = { enabled = "literals" },
+                  parameterTypes = { enabled = true },
+                  variableTypes = { enabled = true },
+                  propertyDeclarationTypes = { enabled = true },
+                  functionLikeReturnTypes = { enabled = true },
+                  enumMemberValues = { enabled = true },
+                },
+                preferGoToSourceDefinition = true,
+                tsserver = {
+                  maxTsServerMemory = 16384,
+                },
+                preferences = {
+                  importModuleSpecifier = "project-relative",
+                  preferTypeOnlyAutoImports = true,
+                  renameMatchingJsxTags = true,
+                },
+              },
+              javascript = {
+                preferGoToSourceDefinition = true,
+                preferences = {
+                  importModuleSpecifier = "project-relative",
+                  renameMatchingJsxTags = true,
+                },
+              },
+            },
+          },
         },
         -- This table contains config for all language servers that are *not* installed via Mason.
         others = {
@@ -240,7 +242,7 @@ require('lazy').setup({
       local ensure_installed = vim.tbl_keys(servers.mason or {})
       vim.list_extend(ensure_installed, {
         'stylua', -- Used to format Lua code
-        'tsgo',
+        'vtsls',
         'js-debug-adapter'
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
