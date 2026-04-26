@@ -152,7 +152,7 @@ require('lazy').setup({
             end
           end
           map('<leader>cao', source_action('source.organizeImports'), '[C]ode [A]ction [O]rganize Imports (TS & JS only)')
-          map('<leader>carm', source_action('source.removeUnused'), '[C]ode [A]ction [R]e[m]ove Unused (TS & JS only)')
+          map('<leader>carm', source_action('source.removeUnusedImports'), '[C]ode [A]ction [R]e[m]ove Unused (TS & JS only)')
           map('<leader>cai', source_action('source.addMissingImports'), '[C]ode [A]ction [I]mport All (TS & JS only)')
           map('<leader>caf', source_action('source.fixAll'), '[C]ode [A]ction [F]ix All (TS & JS only)')
           map('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
