@@ -124,8 +124,6 @@ require('lazy').setup({
 
       -- Autocompletion
       'saghen/blink.cmp',
-
-      'yioneko/nvim-vtsls', -- A plugin for VTSLS, not really a great place to put it but oh well
     },
     config = function()
       vim.api.nvim_create_autocmd('LspAttach', {
@@ -145,10 +143,18 @@ require('lazy').setup({
           map('<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols')
           map('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
           map('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction', { 'n', 'x' })
-          map('<leader>cao', require('vtsls').commands.organize_imports, '[C]ode [A]ction [O]rganize Imports (TS & JS only)')
-          map('<leader>carm', require('vtsls').commands.remove_unused, '[C]ode [A]ction [R]re[m]ove Unused (TS & JS only)')
-          map('<leader>cai', require('vtsls').commands.remove_unused, '[C]ode [A]ction [I]mport All (TS & JS only)')
-          map('<leader>caf', require('vtsls').commands.fix_all, '[C]ode [A]ction [F]ix All (TS & JS only)')
+          local source_action = function(kind)
+            return function()
+              vim.lsp.buf.code_action({
+                apply = true,
+                context = { only = { kind }, diagnostics = {} },
+              })
+            end
+          end
+          map('<leader>cao', source_action('source.organizeImports'), '[C]ode [A]ction [O]rganize Imports (TS & JS only)')
+          map('<leader>carm', source_action('source.removeUnused'), '[C]ode [A]ction [R]e[m]ove Unused (TS & JS only)')
+          map('<leader>cai', source_action('source.addMissingImports'), '[C]ode [A]ction [I]mport All (TS & JS only)')
+          map('<leader>caf', source_action('source.fixAll'), '[C]ode [A]ction [F]ix All (TS & JS only)')
           map('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
         end,
       })
@@ -191,16 +197,8 @@ require('lazy').setup({
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
         mason = {
-          vtsls = {
+          tsgo = {
             settings = {
-              vtsls = {
-                experimental = {
-                  completion = {
-                    enableServerSideFuzzyMatch = true,
-                    entriesLimit = 15,
-                  },
-                },
-              },
               typescript = {
                 inlayHints = {
                   parameterNames = { enabled = "literals" },
@@ -210,10 +208,6 @@ require('lazy').setup({
                   functionLikeReturnTypes = { enabled = true },
                   enumMemberValues = { enabled = true },
                 },
-                preferGoToSourceDefinition = true,
-                tsserver = {
-                  maxTsServerMemory = 16384,
-                },
                 preferences = {
                   importModuleSpecifier = "project-relative",
                   preferTypeOnlyAutoImports = true,
@@ -221,7 +215,6 @@ require('lazy').setup({
                 },
               },
               javascript = {
-                preferGoToSourceDefinition = true,
                 preferences = {
                   importModuleSpecifier = "project-relative",
                   renameMatchingJsxTags = true,
@@ -242,10 +235,17 @@ require('lazy').setup({
       local ensure_installed = vim.tbl_keys(servers.mason or {})
       vim.list_extend(ensure_installed, {
         'stylua', -- Used to format Lua code
-        'vtsls',
         'js-debug-adapter'
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
+
+      -- Migrated from vtsls to tsgo: clean up the old package on startup if still present.
+      vim.defer_fn(function()
+        local ok, registry = pcall(require, 'mason-registry')
+        if ok and registry.is_installed('vtsls') then
+          vim.cmd('MasonUninstall vtsls')
+        end
+      end, 200)
 
       -- Either merge all additional server configs from the `servers.mason` and `servers.others` tables
       -- to the default language server configs as provided by nvim-lspconfig or
