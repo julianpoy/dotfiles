@@ -18,6 +18,7 @@ sudo chsh -s /usr/bin/fish "$USER"
 fish -c "curl -sL https://git.io/fisher | source && fisher install jorgebucaran/fisher"
 fish -c "fisher install oh-my-fish/theme-bobthefish"
 fish -c "fish \"$DOTFILES_DIR/fish-aliases.sh\""
+fish -c "function fish_user_key_bindings; bind ctrl-h backward-kill-word; end; funcsave fish_user_key_bindings"
 
 # NVM
 fish -c "fisher install jorgebucaran/nvm.fish"
