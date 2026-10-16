@@ -348,6 +348,11 @@ require('lazy').setup({
     opts = {},
   },
 
+  {
+    'esmuellert/codediff.nvim',
+    cmd = 'CodeDiff',
+  },
+
   -- Syntax theme
   {
     'rebelot/kanagawa.nvim',
