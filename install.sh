@@ -45,6 +45,14 @@ ln -sf "$DOTFILES_DIR/.tmux.conf" "$HOME/.tmux.conf"
 # Tmate config
 ln -sf "$DOTFILES_DIR/.tmate.conf" "$HOME/.tmate.conf"
 
+# Claude config
+mkdir -p "$HOME/.claude/output-styles" "$HOME/.claude/skills"
+ln -sf "$DOTFILES_DIR/claude/settings.json" "$HOME/.claude/settings.json"
+ln -sf "$DOTFILES_DIR/claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
+ln -sf "$DOTFILES_DIR/claude/output-styles/plainspoken.md" "$HOME/.claude/output-styles/plainspoken.md"
+ln -sfn "$DOTFILES_DIR/claude/skills/review-changes" "$HOME/.claude/skills/review-changes"
+ln -sfn "$DOTFILES_DIR/claude/skills/grill-me" "$HOME/.claude/skills/grill-me"
+
 # Git config
 git config --global --replace-all --bool push.autoSetupRemote true
 

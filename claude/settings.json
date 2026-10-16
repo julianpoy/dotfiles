@@ -1,0 +1,82 @@
+{
+  "attribution": {
+    "commit": "",
+    "pr": "",
+    "sessionUrl": false
+  },
+  "includeCoAuthoredBy": false,
+  "permissions": {
+    "allow": [
+      "Bash(docker compose logs:*)",
+      "Bash(docker compose exec frontend find:*)",
+      "Bash(npm install:*)",
+      "Bash(docker compose restart:*)",
+      "WebSearch",
+      "WebFetch",
+      "Bash(grep:*)",
+      "Bash(find:*)",
+      "Bash(git show:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)"
+    ],
+    "deny": [
+      "Bash(python:*)",
+      "Bash(python3:*)",
+      "Bash(git stash:*)"
+    ],
+    "ask": [
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git reset:*)",
+      "Bash(git rebase:*)",
+      "Bash(git checkout:*)",
+      "Bash(git merge:*)",
+      "Bash(git cherry-pick:*)",
+      "Bash(git revert:*)",
+      "Bash(git branch:*)",
+      "Bash(git tag:*)",
+      "Bash(git pull:*)",
+      "Bash(git clean:*)",
+      "Bash(git restore:*)",
+      "Bash(git switch:*)",
+      "Bash(git apply:*)",
+      "Bash(git am:*)",
+      "Bash(git mv:*)",
+      "Bash(git rm:*)",
+      "Bash(git worktree:*)",
+      "Bash(git update-ref:*)",
+      "Bash(git config:*)",
+      "Bash(git remote:*)",
+      "Bash(git submodule:*)",
+      "Bash(git filter-branch:*)",
+      "Bash(git filter-repo:*)",
+      "Bash(git gc:*)",
+      "Bash(git prune:*)"
+    ],
+    "defaultMode": "auto"
+  },
+  "model": "opus[1m]",
+  "enableWorkflows": false,
+  "workflowKeywordTriggerEnabled": false,
+  "enabledPlugins": {
+    "typescript-lsp@claude-plugins-official": false
+  },
+  "awaySummaryEnabled": false,
+  "tui": "fullscreen",
+  "autoMemoryEnabled": false,
+  "skipWorkflowUsageWarning": true,
+  "theme": "dark-daltonized",
+  "outputStyle": "Plainspoken",
+  "preferredNotifChannel": "ghostty",
+  "autoCompactEnabled": true,
+  "remoteControlAtStartup": true,
+  "inputNeededNotifEnabled": true,
+  "agentPushNotifEnabled": true,
+  "skipAutoPermissionPrompt": true,
+  "modelSettings": {
+    "claude-opus-5-5": {
+      "effortLevel": "high"
+    }
+  }
+}

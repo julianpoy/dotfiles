@@ -28,5 +28,13 @@ curl -sL $DOTFILES_URI/raw/master/.tmux.conf -o $HOME/.tmux.conf
 # Tmate config
 curl -sL $DOTFILES_URI/raw/master/.tmate.conf -o $HOME/.tmate.conf
 
+# Claude config
+mkdir -p $HOME/.claude/output-styles $HOME/.claude/skills/review-changes $HOME/.claude/skills/grill-me
+curl -sL $DOTFILES_URI/raw/master/claude/settings.json -o $HOME/.claude/settings.json
+curl -sL $DOTFILES_URI/raw/master/claude/CLAUDE.md -o $HOME/.claude/CLAUDE.md
+curl -sL $DOTFILES_URI/raw/master/claude/output-styles/plainspoken.md -o $HOME/.claude/output-styles/plainspoken.md
+curl -sL $DOTFILES_URI/raw/master/claude/skills/review-changes/SKILL.md -o $HOME/.claude/skills/review-changes/SKILL.md
+curl -sL $DOTFILES_URI/raw/master/claude/skills/grill-me/SKILL.md -o $HOME/.claude/skills/grill-me/SKILL.md
+
 # Git config
 git config --global --replace-all --bool push.autoSetupRemote true
