@@ -9,6 +9,7 @@ sudo apt-get install -y \
   python3-pynvim \
   fish fonts-powerline \
   ripgrep fd-find \
+  inotify-tools \
   gh gpg
 
 sudo apt-get install -y netcat || sudo apt-get install -y netcat-openbsd
