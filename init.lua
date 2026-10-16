@@ -186,6 +186,14 @@ require('lazy').setup({
       --  So, we create new capabilities with blink.cmp, and then broadcast that to the servers.
       local capabilities = require('blink.cmp').get_lsp_capabilities()
 
+      -- On Linux Neovim disables workspace/didChangeWatchedFiles dynamic registration.
+      capabilities.workspace = capabilities.workspace or {}
+      capabilities.workspace.didChangeWatchedFiles = {
+        dynamicRegistration = true,
+        relativePatternSupport = true,
+      }
+      vim.lsp.config('*', { capabilities = capabilities })
+
       -- Enable the following language servers
       --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
       --
@@ -197,7 +205,7 @@ require('lazy').setup({
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
         mason = {
-          tsgo = {
+          tsc = {
             settings = {
               typescript = {
                 inlayHints = {
@@ -244,6 +252,13 @@ require('lazy').setup({
         local ok, registry = pcall(require, 'mason-registry')
         if ok and registry.is_installed('vtsls') then
           vim.cmd('MasonUninstall vtsls')
+        end
+      end, 200)
+      -- Migrated from tsgo to tsc: clean up the old package on startup if still present.
+      vim.defer_fn(function()
+        local ok, registry = pcall(require, 'mason-registry')
+        if ok and registry.is_installed('tsgo') then
+          vim.cmd('MasonUninstall tsgo')
         end
       end, 200)
 
