@@ -46,6 +46,7 @@ ln -sf "$DOTFILES_DIR/.tmux.conf" "$HOME/.tmux.conf"
 ln -sf "$DOTFILES_DIR/.tmate.conf" "$HOME/.tmate.conf"
 
 # Claude config
+curl -fsSL https://claude.ai/install.sh | bash
 mkdir -p "$HOME/.claude/output-styles" "$HOME/.claude/skills"
 ln -sf "$DOTFILES_DIR/claude/settings.json" "$HOME/.claude/settings.json"
 ln -sf "$DOTFILES_DIR/claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
