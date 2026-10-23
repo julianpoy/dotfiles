@@ -23,8 +23,8 @@ fish -c "function fish_user_key_bindings; bind ctrl-h backward-kill-word; end; f
 
 # NVM
 fish -c "fisher install jorgebucaran/nvm.fish"
-$DOTFILES_DIR/nvmInstallVersion.sh v24.7.0
-fish -c "set --universal nvm_default_version v24.7.0"
+$DOTFILES_DIR/nvmInstallVersion.sh v24.22.0
+fish -c "set --universal nvm_default_version v24.22.0"
 fish -c "set --universal nvm_default_packages yarn nx neovim typescript tsx"
 
 # NeoVim
