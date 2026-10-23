@@ -3,7 +3,7 @@ name: review-changes
 description: "Multi-agent review of staged or unstaged git changes, the current branch, or the last N commits, for bugs, functionality, related code outside the diff that must change too, over-complexity, best practices, repo practice adherence, and style and naming adherence. Can apply the verified fixes."
 when_to_use: "Use when the user asks to spin up or launch a number of agents to review the staged or unstaged changes, the current branch, or the last few commits, for example \"Please spin up 3 agents and review the staged changes. Apply the changes you feel relevant.\" or \"Spin up 4 agents and review the last 2 commits.\""
 argument-hint: "[agent-count] [staged|unstaged|branch|HEAD~N] [apply]"
-allowed-tools: Bash(git diff *) Bash(git status *) Bash(git ls-files *) Bash(git log *) Bash(git rev-parse *) Bash(git symbolic-ref *)
+allowed-tools: Bash(git diff *) Bash(git status *) Bash(git ls-files *) Bash(git log *) Bash(git rev-parse *) Bash(git symbolic-ref *) Bash(gh pr view *)
 ---
 
 # Review changes
@@ -41,9 +41,10 @@ Get these values from the arguments or from the user's message:
 
 For the branch scope, find `{base}`:
 
-1. Run `git symbolic-ref --short refs/remotes/origin/HEAD`.
-2. If that fails, use the first of `main` and `master` that `git rev-parse --verify` finds.
-3. If neither exists, ask the user for the base branch.
+1. Run `gh pr view --json baseRefName,title,body`. If it returns a PR, use the first of `origin/{baseRefName}` and `{baseRefName}` that `git rev-parse --verify` finds. Keep the title and body for Step 2.
+2. If there is no PR, or `gh` fails, run `git symbolic-ref --short refs/remotes/origin/HEAD`.
+3. If that fails, use the first of `main` and `master` that `git rev-parse --verify` finds.
+4. If you still have no base, ask the user for the base branch.
 
 For the HEAD~N scope, run `git rev-parse --verify HEAD~N`. If it fails, the repo has too few commits, so stop here and tell the user.
 
@@ -57,7 +58,8 @@ Write the requirements of the change as a numbered list. Use these sources, in t
 
 1. A spec, issue, or file that the user gave.
 2. What the user asked for in this conversation.
-3. For the branch and HEAD~N scopes, the commit messages. Get them with `git log --format=%B {commit range}`.
+3. For the branch scope, the title and body of the PR from Step 1.
+4. For the branch and HEAD~N scopes, the commit messages. Get them with `git log --format=%B {commit range}`.
 
 State what the change must do, in the user's terms. Leave out how you built it, the trade-offs you chose, and why the code looks the way it does. The reviewers must judge the code without your reasoning.
 
@@ -168,8 +170,8 @@ Done when every agent has returned.
 ## Step 5: Verify and merge
 
 1. Merge duplicate findings. Record each area that found each one. For a code group finding, also record how many code reviewers found it, for example "found by 2 of 3". Count only the code reviewers that had the file of the finding. A finding that only one reviewer found stays in. The count does not replace step 2.
-2. Open the cited code for each finding and confirm that the problem is real at that location. Agent findings are claims, not facts. Remove each finding that you cannot confirm.
-3. You wrote this code, so you are biased toward it. A finding is still valid when the code does what you meant it to do. Skip a finding for a deliberate choice only when the user agreed to that choice in this conversation, and say where.
+2. Open the cited code for each finding and confirm that the problem is real at that location. Agent findings are claims, not facts. Remove each finding that you cannot confirm. For each file that you recorded in Step 1 with uncommitted changes, open it with `git show HEAD:` and the file path, not from disk.
+3. If you wrote this code, you are biased toward it. A finding is still valid when the code does what you meant it to do. Skip a finding for a deliberate choice only when the user agreed to that choice in this conversation, and say where.
 4. If two findings conflict, choose one and give the reason.
 5. Check the "Related code" coverage table. Open each peer with the status "missed", and each peer with the status "not needed" that has a weak reason or no reason. If a "not needed" reason is wrong, change the row to "missed" and add a finding. If a peer that you know about is not in the table, add it. The table is for your check only. Do not put it in the report. A missed peer becomes a normal finding, so nothing from the table is lost.
 6. Give each finding a verdict:
@@ -185,12 +187,12 @@ If APPLY is false, leave all files as they are.
 
 If APPLY is true:
 
-1. Apply each finding with the verdict Apply. Follow CLAUDE.md and match nearby code.
+1. Apply each finding with the verdict Apply. Find the code by the quoted lines in the finding, not by the line number. Follow CLAUDE.md and match nearby code.
 2. Leave your edits unstaged, and do not commit or amend. For the staged scope, this keeps your edits separate from the user's staged work. For the branch and HEAD~N scopes, this keeps the user's commits as they are.
 3. Run the verification commands in CLAUDE.md. Fix failures that your edits caused. Report failures that were there before your edits.
 4. Review once. The user decides if another review is necessary. Each pass finds new judgement calls, so repeated passes do not reach a clean result.
 
-Report the findings grouped by area, in the order of "Review areas", so a clean area does not hide a failing one. Number the findings across the full report so the user can select them by number. For each finding, give the number, file:line, verdict, and a one-line reason. If there is more than one code reviewer, also give the count from Step 5 for each code group finding. Put the Ask findings together at the end, each with its question. If APPLY is true, add the verification result (pass, or the failing output). End with one line for each area: its finding count and its worst finding.
+Report the findings grouped by area, in the order of "Review areas", so a clean area does not hide a failing one. Number the findings across the full report so the user can select them by number. For each finding, give the number, file:line, verdict, and a one-line reason. If there is more than one code reviewer, also give the count from Step 5 for each code group finding. Put the Ask findings together at the end, each with its question. If APPLY is true, add the verification result (pass, or the failing output), and list each edit in a file that you recorded in Step 1 with uncommitted changes. End with one line for each area: its finding count and its worst finding.
 
 ## Review areas
 
