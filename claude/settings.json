@@ -20,8 +20,6 @@
       "Bash(git log:*)"
     ],
     "deny": [
-      "Bash(python:*)",
-      "Bash(python3:*)",
       "Bash(git stash:*)"
     ],
     "ask": [
@@ -52,7 +50,9 @@
       "Bash(git filter-branch:*)",
       "Bash(git filter-repo:*)",
       "Bash(git gc:*)",
-      "Bash(git prune:*)"
+      "Bash(git prune:*)",
+      "Bash(gh pr create:*)",
+      "Bash(gh pr new:*)"
     ],
     "defaultMode": "auto"
   },
