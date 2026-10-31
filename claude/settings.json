@@ -52,7 +52,9 @@
       "Bash(git gc:*)",
       "Bash(git prune:*)",
       "Bash(gh pr create:*)",
-      "Bash(gh pr new:*)"
+      "Bash(gh pr new:*)",
+      "Bash(kubectl:*)",
+      "Bash(rm -rf:*)"
     ],
     "defaultMode": "auto"
   },
