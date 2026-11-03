@@ -51,6 +51,7 @@
       "Bash(git filter-repo:*)",
       "Bash(git gc:*)",
       "Bash(git prune:*)",
+      "Bash(git -C:*)",
       "Bash(gh pr create:*)",
       "Bash(gh pr new:*)",
       "Bash(kubectl:*)",
