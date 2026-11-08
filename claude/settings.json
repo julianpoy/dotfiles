@@ -63,23 +63,32 @@
   "enableWorkflows": false,
   "workflowKeywordTriggerEnabled": false,
   "enabledPlugins": {
-    "typescript-lsp@claude-plugins-official": false
+    "typescript-lsp@claude-plugins-official": false,
+    "inline-images@cc-inline-images-mod": true
+  },
+  "extraKnownMarketplaces": {
+    "cc-inline-images-mod": {
+      "source": {
+        "source": "github",
+        "repo": "SergioGhisler/cc-inline-images-mod"
+      }
+    }
+  },
+  "outputStyle": "Plainspoken",
+  "modelSettings": {
+    "claude-opus-5-5": {
+      "effortLevel": "high"
+    }
   },
   "awaySummaryEnabled": false,
   "tui": "fullscreen",
   "autoMemoryEnabled": false,
   "skipWorkflowUsageWarning": true,
   "theme": "dark-daltonized",
-  "outputStyle": "Plainspoken",
   "preferredNotifChannel": "ghostty",
   "autoCompactEnabled": true,
   "remoteControlAtStartup": true,
   "inputNeededNotifEnabled": true,
   "agentPushNotifEnabled": true,
-  "skipAutoPermissionPrompt": true,
-  "modelSettings": {
-    "claude-opus-5-5": {
-      "effortLevel": "high"
-    }
-  }
+  "skipAutoPermissionPrompt": true
 }

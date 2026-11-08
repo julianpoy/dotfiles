@@ -2,7 +2,7 @@
 
 DOTFILES_URI=${DOTFILES_URI:-https://github.com/julianpoy/dotfiles}
 
-brew install fish jq btop python pynvim ripgrep fd neovim tmux tmate
+brew install fish jq btop python pynvim ripgrep fd neovim tmux tmate imagemagick
 
 # Fish
 sudo chsh -s /usr/bin/fish $USER
@@ -35,6 +35,8 @@ curl -sL $DOTFILES_URI/raw/master/claude/CLAUDE.md -o $HOME/.claude/CLAUDE.md
 curl -sL $DOTFILES_URI/raw/master/claude/output-styles/plainspoken.md -o $HOME/.claude/output-styles/plainspoken.md
 curl -sL $DOTFILES_URI/raw/master/claude/skills/review-changes/SKILL.md -o $HOME/.claude/skills/review-changes/SKILL.md
 curl -sL $DOTFILES_URI/raw/master/claude/skills/grill-me/SKILL.md -o $HOME/.claude/skills/grill-me/SKILL.md
+claude plugin marketplace add SergioGhisler/cc-inline-images-mod
+claude plugin install inline-images@cc-inline-images-mod
 
 # Git config
 git config --global --replace-all --bool push.autoSetupRemote true

@@ -10,6 +10,7 @@ sudo apt-get install -y \
   fish fonts-powerline \
   ripgrep fd-find \
   inotify-tools \
+  imagemagick \
   gh gpg
 
 sudo apt-get install -y netcat || sudo apt-get install -y netcat-openbsd
@@ -53,6 +54,8 @@ ln -sf "$DOTFILES_DIR/claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
 ln -sf "$DOTFILES_DIR/claude/output-styles/plainspoken.md" "$HOME/.claude/output-styles/plainspoken.md"
 ln -sfn "$DOTFILES_DIR/claude/skills/review-changes" "$HOME/.claude/skills/review-changes"
 ln -sfn "$DOTFILES_DIR/claude/skills/grill-me" "$HOME/.claude/skills/grill-me"
+"$HOME/.local/bin/claude" plugin marketplace add SergioGhisler/cc-inline-images-mod
+"$HOME/.local/bin/claude" plugin install inline-images@cc-inline-images-mod
 
 # Git config
 git config --global --replace-all --bool push.autoSetupRemote true
