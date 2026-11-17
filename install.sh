@@ -48,6 +48,7 @@ ln -sf "$DOTFILES_DIR/.tmate.conf" "$HOME/.tmate.conf"
 
 # Claude config
 curl -fsSL https://claude.ai/install.sh | bash
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.config/fish/config.fish
 mkdir -p "$HOME/.claude/output-styles" "$HOME/.claude/skills"
 ln -sf "$DOTFILES_DIR/claude/settings.json" "$HOME/.claude/settings.json"
 ln -sf "$DOTFILES_DIR/claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
