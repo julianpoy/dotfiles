@@ -13,9 +13,8 @@ fish -c "fish /tmp/fish-aliases.sh"
 
 # NVM
 fish -c "fisher install jorgebucaran/nvm.fish"
-$DOTFILES_URI/nvmInstallVersion.sh 24.22
-fish -c "set --universal nvm_default_version 24.22"
 fish -c "set --universal nvm_default_packages yarn nx neovim typescript tree-sitter-cli"
+$DOTFILES_URI/nvmInstallVersion.sh 24.22
 
 # NeoVim
 git config --global core.editor "nvim"

@@ -21,3 +21,8 @@ for ver in (nvm list | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+')
     end
 end
 
+set --universal nvm_default_version $installed_version
+nvm use $installed_version
+npm install -g corepack
+corepack enable
+
