@@ -2,7 +2,7 @@
 
 DOTFILES_URI=${DOTFILES_URI:-https://github.com/julianpoy/dotfiles}
 
-brew install fish jq btop python pynvim ripgrep fd neovim tmux tmate imagemagick
+brew install fish jq btop python pynvim ripgrep fd neovim tmux imagemagick
 
 # Fish
 sudo chsh -s /usr/bin/fish $USER
@@ -23,9 +23,6 @@ curl -sL $DOTFILES_URI/raw/master/init.lua -o $HOME/.config/nvim/init.lua
 
 # Tmux config
 curl -sL $DOTFILES_URI/raw/master/.tmux.conf -o $HOME/.tmux.conf
-
-# Tmate config
-curl -sL $DOTFILES_URI/raw/master/.tmate.conf -o $HOME/.tmate.conf
 
 # Claude config
 mkdir -p $HOME/.claude/output-styles $HOME/.claude/skills/review-changes $HOME/.claude/skills/grill-me

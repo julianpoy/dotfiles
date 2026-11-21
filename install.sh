@@ -5,7 +5,7 @@ set -e
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 sudo apt-get install -y \
-  curl gcc jq zip unzip btop tmux tmate vim python3 python3-pip \
+  curl gcc jq zip unzip btop tmux vim python3 python3-pip \
   python3-pynvim \
   fish fonts-powerline \
   ripgrep fd-find \
@@ -41,9 +41,6 @@ ln -sf "$DOTFILES_DIR/init.lua" "$HOME/.config/nvim/init.lua"
 
 # Tmux config
 ln -sf "$DOTFILES_DIR/.tmux.conf" "$HOME/.tmux.conf"
-
-# Tmate config
-ln -sf "$DOTFILES_DIR/.tmate.conf" "$HOME/.tmate.conf"
 
 # Claude config
 curl -fsSL https://claude.ai/install.sh | bash
