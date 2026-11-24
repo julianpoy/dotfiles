@@ -2,7 +2,7 @@
 
 DOTFILES_URI=${DOTFILES_URI:-https://github.com/julianpoy/dotfiles}
 
-brew install fish jq btop python pynvim ripgrep fd neovim tmux imagemagick
+brew install fish jq btop python pynvim ripgrep fd neovim tree-sitter-cli tmux imagemagick
 
 # Fish
 sudo chsh -s /usr/bin/fish $USER
@@ -13,7 +13,7 @@ fish -c "fish /tmp/fish-aliases.sh"
 
 # NVM
 fish -c "fisher install jorgebucaran/nvm.fish"
-fish -c "set --universal nvm_default_packages yarn nx neovim typescript tree-sitter-cli"
+fish -c "set --universal nvm_default_packages yarn nx neovim typescript"
 $DOTFILES_URI/nvmInstallVersion.sh 24.22
 
 # NeoVim

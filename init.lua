@@ -358,7 +358,6 @@ require('lazy').setup({
     'rebelot/kanagawa.nvim',
     config = function()
       vim.o.background = "dark"
-      vim.cmd.colorscheme 'kanagawa'
       require('kanagawa').setup({
         compile = true,
         dimInactive = true,
@@ -381,16 +380,17 @@ require('lazy').setup({
         },
         overrides = function(colors)
           return {
-            ['@type.qualifier'] = { fg = colors.palette.peachRed, italic = true },
+            ['@keyword.modifier'] = { fg = colors.palette.peachRed, italic = true },
             ['@property'] = { fg = colors.palette.fujiWhite, italic = false },
-            ['@method.call'] = { fg = colors.palette.fujiWhite, italic = false },
+            ['@function.method.call'] = { fg = colors.palette.fujiWhite, italic = false },
             ['@function.call'] = { fg = colors.palette.fujiWhite, italic = false },
-            ['@field'] = { fg = colors.palette.fujiWhite, italic = false },
+            ['@variable.member'] = { fg = colors.palette.fujiWhite, italic = false },
             ['@boolean'] = { fg = colors.palette.surimiOrange, bold = false },
             ['LspSignatureActiveParameter'] = { fg = colors.palette.waveAqua2, bold = false },
           }
         end,
       })
+      vim.cmd.colorscheme 'kanagawa'
       vim.schedule(vim.cmd.KanagawaCompile)
     end,
     lazy = false,
@@ -762,33 +762,47 @@ require('lazy').setup({
   -- Highlight code
   {
     'nvim-treesitter/nvim-treesitter',
-    branch = 'master',
+    branch = 'main',
+    lazy = false,
     build = ":TSUpdate",
-    main = 'nvim-treesitter.configs',
-    opts = {
-      ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'tsx', 'typescript', 'vimdoc', 'vim' },
+    config = function()
+      local treesitter = require('nvim-treesitter')
+      treesitter.install({ 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'tsx', 'typescript', 'vimdoc', 'vim' })
 
-      auto_install = true,
+      local available = treesitter.get_available()
+      local max_filesize = 100 * 1024 -- 100 KB
 
-      highlight = {
-        enable = true,
-        disable = function(lang, buf)
-          local max_filesize = 100 * 1024 -- 100 KB
-          local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
+      local function start(buf, lang)
+        if vim.api.nvim_buf_is_valid(buf) and vim.treesitter.language.add(lang) then
+          vim.treesitter.start(buf, lang)
+        end
+      end
+
+      vim.api.nvim_create_autocmd('FileType', {
+        group = vim.api.nvim_create_augroup('jp-treesitter', { clear = true }),
+        callback = function(event)
+          local lang = vim.treesitter.language.get_lang(event.match)
+          if not lang then
+            return
+          end
+
+          local ok, stats = pcall(vim.uv.fs_stat, vim.api.nvim_buf_get_name(event.buf))
           if ok and stats and stats.size > max_filesize then
-            return true
+            return
+          end
+
+          if vim.treesitter.language.add(lang) then
+            start(event.buf, lang)
+          elseif vim.tbl_contains(available, lang) then
+            treesitter.install(lang):await(function()
+              vim.schedule(function()
+                start(event.buf, lang)
+              end)
+            end)
           end
         end,
-        additional_vim_regex_highlighting = false,
-      },
-      indent = {
-        enable = false,
-        disable = { 'python', 'typescript', 'javascript', 'tsx' }
-      },
-      incremental_selection = {
-        enable = false, -- Perhaps play with in the future, but not useful for now
-      },
-    },
+      })
+    end,
   },
 
   -- Debugger
@@ -989,7 +1003,7 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   desc = 'Highlight when yanking (copying) text',
   group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
   callback = function()
-    vim.highlight.on_yank()
+    vim.hl.on_yank()
   end,
 })
 
@@ -1053,8 +1067,8 @@ vim.keymap.set('n', '<leader>sk', require('telescope.builtin').keymaps, { desc =
 vim.keymap.set('n', '<leader>sr', require('telescope.builtin').resume, { desc = '[S]earch [R]esume (previous search)' })
 
 -- Diagnostic keymaps
-vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = "Go to previous [d]iagnostic message" })
-vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = "Go to next [d]iagnostic message" })
+vim.keymap.set('n', '[d', function() vim.diagnostic.jump({ count = -1, float = true }) end, { desc = "Go to previous [d]iagnostic message" })
+vim.keymap.set('n', ']d', function() vim.diagnostic.jump({ count = 1, float = true }) end, { desc = "Go to next [d]iagnostic message" })
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = "Show floating diagnostic [e]rror message" })
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = "Open diagnostics list" })
 

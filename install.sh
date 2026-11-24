@@ -30,11 +30,14 @@ $DOTFILES_DIR/nvmInstallVersion.sh v24.22.0
 # NeoVim
 sudo rm -rf ~/.neovim-bin
 mkdir ~/.neovim-bin
-wget https://github.com/neovim/neovim/releases/download/v0.11.4/nvim-linux-x86_64.tar.gz -O ~/.neovim-bin/nvim-linux-x86_64.tar.gz
+wget https://github.com/neovim/neovim/releases/download/v0.12.6/nvim-linux-x86_64.tar.gz -O ~/.neovim-bin/nvim-linux-x86_64.tar.gz
 sudo tar -C ~/.neovim-bin -xzf ~/.neovim-bin/nvim-linux-x86_64.tar.gz
 fish -c "alias vim='~/.neovim-bin/nvim-linux-x86_64/bin/nvim' && funcsave vim"
 fish -c "alias nvim='~/.neovim-bin/nvim-linux-x86_64/bin/nvim' && funcsave nvim"
 git config --global core.editor "~/.neovim-bin/nvim-linux-x86_64/bin/nvim"
+mkdir -p ~/.local/bin
+wget https://github.com/tree-sitter/tree-sitter/releases/download/v0.27.2/tree-sitter-linux-x64.gz -O - | gunzip > ~/.local/bin/tree-sitter
+chmod +x ~/.local/bin/tree-sitter
 
 mkdir -p "$HOME/.config/nvim"
 ln -sf "$DOTFILES_DIR/init.lua" "$HOME/.config/nvim/init.lua"
